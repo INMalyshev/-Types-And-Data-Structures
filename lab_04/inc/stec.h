@@ -2,6 +2,7 @@
 #define STEC_H
 
 #include <stddef.h>
+#include <stdio.h>
 
 typedef struct
 {
@@ -21,5 +22,6 @@ stec_t *new_stec_t(void);
 void clear_stec_t(stec_t *stec);
 int pop_stec_t(stec_t *stec);
 stec_note_t *push_stec_t(stec_t *stec, void *data);
+void print_stec_t(FILE *f, stec_t *stec, void printing_function (FILE*, void*));
 
 #endif

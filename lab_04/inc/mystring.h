@@ -12,4 +12,8 @@ typedef struct
   size_t allocated;
 } string_t;
 
+int scan_string_t(string_t *dst, FILE *restrict f);
+void free_string_t(string_t *string);
+void print_string_t(FILE *f, string_t *string);
+
 #endif

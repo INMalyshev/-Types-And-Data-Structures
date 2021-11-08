@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <stdio.h>
 
 #include "rc.h"
 #include "stec.h"
@@ -50,4 +51,10 @@ stec_note_t *push_stec_t(stec_t *stec, void *data)
   stec->current_note = new_current_note;
 
   return new_current_note;
+}
+
+void print_stec_t(FILE *f, stec_t *stec, void printing_function (FILE*, void*))
+{
+  for (stec_note_t *note = stec->current_note; note; note = note->previous)
+    printing_function(f, note->data);
 }

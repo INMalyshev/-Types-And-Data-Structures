@@ -12,4 +12,9 @@
 /* stec.h */
 #define STECK_IS_EMPTY 40
 
+/* shape */
+#define EXIT 1
+#define ERROR 2
+
+
 #endif
