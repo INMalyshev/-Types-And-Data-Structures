@@ -4,9 +4,12 @@
 #define OK 0
 
 /* mystring */
-#define ALLOCATION_ERROR 100
-#define READ_ERROR 101
-#define NO_STRING 102
-#define BLANK_STRING 103
+#define ALLOCATION_ERROR 120
+#define READ_ERROR 121
+#define NO_STRING 122
+#define BLANK_STRING 123
+
+/* stec.h */
+#define STECK_IS_EMPTY 40
 
 #endif
