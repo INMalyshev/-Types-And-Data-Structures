@@ -1,8 +1,10 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 
 #include "rc.h"
 #include "stec.h"
+#include "mystring.h"
 
 stec_t *new_stec_t(void)
 {
@@ -61,5 +63,22 @@ void print_stec_t(FILE *f, stec_t *stec, void printing_function (FILE*, void*))
   {
     fprintf(f, "<%p> : ", (void*) note->data);
     printing_function(f, note->data);
+  }
+}
+
+void solve_case_stec_t(FILE *f, stec_t *stec)
+{
+  if (!stec->current_note)
+    return;
+
+  stec_note_t *current_note = stec->current_note;
+
+  while (current_note)
+  {
+    for (int i = (int) strlen(((string_t*) current_note->data)->string) - 1; i >= 0; i--)
+      fprintf(f, "%c", ((string_t*) current_note->data)->string[i]);
+    fprintf(f, "\n");
+
+    current_note = current_note->previous;
   }
 }

@@ -1,10 +1,12 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <inttypes.h>
 
 #include "rc.h"
 #include "stec.h"
 #include "mystring.h"
 #include "shape.h"
+#include "tick.h"
 
 void skip_stdin(void)
 {
@@ -18,14 +20,26 @@ void skip_stdin(void)
 
 void print_wellcome_menu(void)
 {
-  printf("1. [СТЕК] Добавить элемент в стек (push);\n");
-  printf("2. [СТЕК] Удалить элемент из стека (pop);\n");
-  printf("3. [СТЕК] Вывести состояние стека;\n");
-  printf("4. [СТЕК] Вывести список освобожденных областей;\n");
-  printf("5. [СТЕК] Очистить стек;\n");
-  printf("6. [СТЕК] Сбросить список освобожденных обласей;\n");
-
-  printf("0. Выход.\n");
+  printf(" 1. [СПИСОК] Добавить элемент в стек (push);\n");
+  printf(" 2. [СПИСОК] Удалить элемент из стека (pop);\n");
+  printf(" 3. [СПИСОК] Вывести состояние стека;\n");
+  printf(" 4. [СПИСОК] Вывести список освобожденных областей;\n");
+  printf(" 5. [СПИСОК] Очистить стек;\n");
+  printf(" 6. [СПИСОК] Сбросить список освобожденных обласей;\n");
+  printf(" 7. [СПИСОК] Распечатать слова в обратном порядке в перевернутом виде;\n");
+  printf("\n");
+  printf(" 8. [МАССИВ] Добавить элемент в стек (push);\n");
+  printf(" 9. [МАССИВ] Удалить элемент из стека (pop);\n");
+  printf("10. [МАССИВ] Вывести состояние стека;\n");
+  printf("11. [МАССИВ] Вывести список освобожденных областей;\n");
+  printf("12. [МАССИВ] Сбросить стек;\n");
+  printf("13. [МАССИВ] Сбросить список освобожденных обласей;\n");
+  printf("14. [МАССИВ] Распечатать слова в обратном порядке в перевернутом виде;\n");
+  printf("\n");
+  printf("15. Сгенерировать статистику на по одной размерности;\n");
+  printf("16. Вывести готовую статистику из файла ('statistics.txt');\n");
+  printf("\n");
+  printf(" 0. Выход.\n");
 }
 
 int handle_manu(base_t *data_base)
@@ -46,7 +60,7 @@ int handle_manu(base_t *data_base)
       skip_stdin();
       continue;
     }
-    if (choice < 0 || choice > 6)
+    if (choice < 0 || choice > 7)
     {
       printf("Неправильный ввод. Запрос на повторный ввод:\n");
       continue;
@@ -62,6 +76,7 @@ int handle_manu(base_t *data_base)
     {
       clear_stec_t(data_base->stec);
       free(data_base->stec);
+      free_list_t(data_base->stec_deallocated_memory);
       return EXIT;
     };
     case 1:
@@ -142,6 +157,22 @@ int handle_manu(base_t *data_base)
       data_base->stec_deallocated_memory = new_list_t();
       return OK;
     };
+    case 7:
+    {
+      if (0 == data_base->stec->stec_len)
+      {
+        printf("СТЕК пуст!\n");
+        return OK;
+      }
+
+      uint64_t t1 = tick();
+      solve_case_stec_t(stdout, data_base->stec);
+      uint64_t t2 = tick();
+
+      printf("\nВремя выполнения пункта (в тактах) : %"PRIu64"\n", t2 - t1);
+
+      return OK;
+    }
   }
 
   return ERROR;

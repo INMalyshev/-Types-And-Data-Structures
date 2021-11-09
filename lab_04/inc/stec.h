@@ -24,4 +24,6 @@ int pop_stec_t(stec_t *stec);
 stec_note_t *push_stec_t(stec_t *stec, void *data);
 void print_stec_t(FILE *f, stec_t *stec, void printing_function (FILE*, void*));
 
+void solve_case_stec_t(FILE *f, stec_t *stec);
+
 #endif
