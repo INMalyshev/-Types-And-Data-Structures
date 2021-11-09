@@ -30,6 +30,7 @@ int pop_stec_t(stec_t *stec)
   free_stec_note_t(stec->current_note);
 
   stec->current_note = new_current_note;
+  stec->stec_len--;
 
   return OK;
 }
@@ -49,6 +50,7 @@ stec_note_t *push_stec_t(stec_t *stec, void *data)
   new_current_note->data = data;
 
   stec->current_note = new_current_note;
+  stec->stec_len++;
 
   return new_current_note;
 }
@@ -56,5 +58,8 @@ stec_note_t *push_stec_t(stec_t *stec, void *data)
 void print_stec_t(FILE *f, stec_t *stec, void printing_function (FILE*, void*))
 {
   for (stec_note_t *note = stec->current_note; note; note = note->previous)
+  {
+    fprintf(f, "<%p> : ", (void*) note->data);
     printing_function(f, note->data);
+  }
 }

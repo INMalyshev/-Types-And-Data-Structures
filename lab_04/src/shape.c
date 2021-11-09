@@ -18,13 +18,12 @@ void skip_stdin(void)
 
 void print_wellcome_menu(void)
 {
-  printf("1. [СТЕК] Прочитать элементы стека из файла;\n");
-  printf("2. [СТЕК] Добавить элемент в стек (push);\n");
-  printf("3. [СТЕК] Удалить элемент из стека (pop);\n");
-  printf("4. [СТЕК] Ввести состояние стека;\n");
-  printf("5. [СТЕК] Вывести список освобожденных областей;\n");
-  printf("6. [СТЕК] Очистить стек;\n");
-  printf("7. [СТЕК] Сбросить список освобожденных обласей;\n");
+  printf("1. [СТЕК] Добавить элемент в стек (push);\n");
+  printf("2. [СТЕК] Удалить элемент из стека (pop);\n");
+  printf("3. [СТЕК] Вывести состояние стека;\n");
+  printf("4. [СТЕК] Вывести список освобожденных областей;\n");
+  printf("5. [СТЕК] Очистить стек;\n");
+  printf("6. [СТЕК] Сбросить список освобожденных обласей;\n");
 
   printf("0. Выход.\n");
 }
@@ -47,7 +46,7 @@ int handle_manu(base_t *data_base)
       skip_stdin();
       continue;
     }
-    if (choice < 0 || choice > 7)
+    if (choice < 0 || choice > 6)
     {
       printf("Неправильный ввод. Запрос на повторный ввод:\n");
       continue;
@@ -67,14 +66,11 @@ int handle_manu(base_t *data_base)
     };
     case 1:
     {
-      return EXIT;
-    };
-    case 2:
-    {
-      printf("Введите слово:\n");
-
       string_t *string = malloc(sizeof(string_t));
       if (!string) return ALLOCATION_ERROR;
+
+      printf("Введите слово:\n");
+      scan_string_t(string, stdin);
 
       int got_string = 0;
 
@@ -82,7 +78,7 @@ int handle_manu(base_t *data_base)
       {
         if  (OK != scan_string_t(string, stdin))
         {
-          printf("Слово введено неверно. Повторите ввод:\n");
+          printf("Ошибка ввода. Введите слово заново:\n");
           continue;
         }
         got_string = 1;
@@ -93,28 +89,58 @@ int handle_manu(base_t *data_base)
 
       return OK;
     };
+    case 2:
+    {
+      if (0 == data_base->stec->stec_len)
+      {
+        printf("СТЕК пуст!\n");
+        return OK;
+      }
+      push_list_t(data_base->stec_deallocated_memory, data_base->stec->current_note->data);
+      pop_stec_t(data_base->stec);
+      return OK;
+    };
     case 3:
     {
-      pop_stec_t(data_base->stec);
+      if (0 == data_base->stec->stec_len)
+      {
+        printf("СТЕК пуст!\n");
+        return OK;
+      }
+      print_stec_t(stdout, data_base->stec, (void(*) (FILE*, void*)) print_string_t);
       return OK;
     };
     case 4:
     {
-      print_stec_t(stdout, data_base->stec, (void(*) (FILE*, void*)) print_string_t);
+      if (0 == data_base->stec_deallocated_memory->len)
+      {
+        printf("Список освобожденных областей пуст.\n");
+        return OK;
+      }
+      print_list_t(data_base->stec_deallocated_memory);
       return OK;
     };
     case 5:
     {
-      return EXIT;
+      if (0 == data_base->stec->stec_len)
+      {
+        printf("СТЕК пуст!\n");
+        return OK;
+      }
+
+      do
+      {
+        if (data_base->stec->current_note)
+          push_list_t(data_base->stec_deallocated_memory, data_base->stec->current_note->data);
+      } while(OK == pop_stec_t(data_base->stec));
+
+      return OK;
     };
     case 6:
     {
-      clear_stec_t(data_base->stec);
+      free_list_t(data_base->stec_deallocated_memory);
+      data_base->stec_deallocated_memory = new_list_t();
       return OK;
-    };
-    case 7:
-    {
-      return EXIT;
     };
   }
 
@@ -124,4 +150,51 @@ int handle_manu(base_t *data_base)
 void print_line(void)
 {
   printf("|------------------------------------------------------|\n");
+}
+
+int push_list_t(list_t* list, void* data)
+{
+  if (list->len >= list->allocated)
+  {
+    void **new_dm = realloc(list->deallocated_memory, sizeof(void*) * list->allocated * ALLOCATION_INDEX_LIST_T);
+    if (!new_dm)
+    {
+      free(list->deallocated_memory);
+      return ALLOCATION_ERROR;
+    }
+    list->deallocated_memory = new_dm;
+    list->allocated *= ALLOCATION_INDEX_LIST_T;
+  }
+
+  list->deallocated_memory[list->len++] = data;
+
+  return OK;
+}
+
+void free_list_t(list_t* list)
+{
+  free(list->deallocated_memory);
+  free(list);
+}
+
+void print_list_t(list_t* list)
+{
+  for (size_t i = 0; i < list->len; i++)
+    printf("<%p>\n", (void*) list->deallocated_memory[i]);
+}
+
+list_t *new_list_t(void)
+{
+  void **data = calloc(INITIAL_LIST_T_ALLOCATION, sizeof(void*));
+  if (!data) return NULL;
+  list_t *new = malloc(sizeof(list_t));
+  if (!new)
+  {
+    free(data);
+    return NULL;
+  }
+  new->deallocated_memory = data;
+  new->len = 0;
+  new->allocated = INITIAL_LIST_T_ALLOCATION;
+  return new;
 }
