@@ -4,6 +4,7 @@
 
 #include "rc.h"
 #include "stec.h"
+#include "array_stec.h"
 #include "mystring.h"
 #include "shape.h"
 #include "tick.h"
@@ -60,7 +61,7 @@ int handle_manu(base_t *data_base)
       skip_stdin();
       continue;
     }
-    if (choice < 0 || choice > 7)
+    if (choice < 0 || choice > 16)
     {
       printf("Неправильный ввод. Запрос на повторный ввод:\n");
       continue;
@@ -76,7 +77,9 @@ int handle_manu(base_t *data_base)
     {
       clear_stec_t(data_base->stec);
       free(data_base->stec);
+      free_array_stec_t(data_base->array_stec);
       free_list_t(data_base->stec_deallocated_memory);
+      free_list_t(data_base->array_stec_deallocated_memory);
       return EXIT;
     };
     case 1:
@@ -173,6 +176,150 @@ int handle_manu(base_t *data_base)
 
       return OK;
     }
+    case 8:
+    {
+      if (!data_base->array_stec)
+      {
+        printf("Необходимо инициализировать стек. Введите максимальную длину стека (не более %d).\n", MAX_ARRAY_STEC_LEN);
+
+        int nmemb;
+        int got_nmemb = 0;
+
+        while (!got_nmemb)
+        {
+          if (!scanf("%d", &nmemb))
+          {
+            printf("Целое положительное число введено неверно. Повторите ввод:\n");
+            skip_stdin();
+            got_nmemb = 0;
+            continue;
+          }
+
+          if (nmemb < 1 || nmemb > MAX_ARRAY_STEC_LEN)
+          {
+            printf("Целое положительное число от 0 до %d введено неверно. Повторите ввод:\n", MAX_ARRAY_STEC_LEN);
+            skip_stdin();
+            got_nmemb = 0;
+            continue;
+          }
+
+          got_nmemb = 1;
+        }
+
+        data_base->array_stec = new_array_stec_t((size_t) nmemb);
+      }
+
+      if (data_base->array_stec->end_pointer == data_base->array_stec->current_position_pointer)
+      {
+        printf("СТЕК переполнен.\n");
+        return OK;
+      }
+
+      string_t *string = malloc(sizeof(string_t));
+      if (!string) return ALLOCATION_ERROR;
+
+      printf("Введите слово:\n");
+      scan_string_t(string, stdin);
+
+      int got_string = 0;
+
+      while (!got_string)
+      {
+        if  (OK != scan_string_t(string, stdin))
+        {
+          printf("Ошибка ввода. Введите слово заново:\n");
+          continue;
+        }
+        got_string = 1;
+      }
+
+      if (OK != push_array_stec_t(data_base->array_stec, string))
+      {
+        return ALLOCATION_ERROR;
+      }
+
+      return OK;
+    };
+    case 9:
+    {
+      if (!data_base->array_stec)
+      {
+        printf("Необходимо инициализировать стек. Сначала обратитесь к пункту 8.\n");
+        return OK;
+      }
+
+      if (data_base->array_stec->start_pointer == data_base->array_stec->current_position_pointer)
+      {
+        printf("СТЕК пуст!\n");
+        return OK;
+      }
+
+      push_list_t(data_base->array_stec_deallocated_memory, *(data_base->array_stec->current_position_pointer - 1));
+      pop_array_stec_t(data_base->array_stec);
+
+      return OK;
+    };
+    case 10:
+    {
+      if (!data_base->array_stec)
+      {
+        printf("Необходимо инициализировать стек. Сначала обратитесь к пункту 8.\n");
+        return OK;
+      }
+
+      if (data_base->array_stec->start_pointer == data_base->array_stec->current_position_pointer)
+      {
+        printf("СТЕК пуст!\n");
+        return OK;
+      }
+
+      print_array_stec_t(stdout, data_base->array_stec, (void(*) (FILE*, void*)) print_string_t);
+
+      return OK;
+    };
+    case 11:
+    {
+      if (0 == data_base->array_stec_deallocated_memory->len)
+      {
+        printf("Список освобожденных областей пуст.\n");
+        return OK;
+      }
+      print_list_t(data_base->array_stec_deallocated_memory);
+      return OK;
+    };
+    case 12:
+    {
+      if (data_base->array_stec)
+      {
+        void **cp = data_base->array_stec->current_position_pointer - 1;
+
+        for (; cp >= data_base->array_stec->start_pointer; cp--)
+          push_list_t(data_base->array_stec_deallocated_memory, *cp);
+
+        free_array_stec_t(data_base->array_stec);
+        data_base->array_stec = NULL;
+      }
+
+      return OK;
+    };
+    case 13:
+    {
+      free_list_t(data_base->array_stec_deallocated_memory);
+      data_base->array_stec_deallocated_memory = new_list_t();
+      return OK;
+    };
+    case 14:
+    {
+      return EXIT;
+    };
+    case 15:
+    {
+      return EXIT;
+    };
+    case 16:
+    {
+      return EXIT;
+    };
   }
 
   return ERROR;

@@ -12,6 +12,9 @@
 /* stec.h */
 #define STECK_IS_EMPTY 40
 
+/* array_stec.h */
+#define STECK_IS_FULL 41
+
 /* shape */
 #define EXIT 1
 #define ERROR 2
