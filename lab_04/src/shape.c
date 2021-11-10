@@ -77,7 +77,10 @@ int handle_manu(base_t *data_base)
     {
       clear_stec_t(data_base->stec);
       free(data_base->stec);
-      free_array_stec_t(data_base->array_stec);
+      if (data_base->array_stec)
+      {
+        free_array_stec_t(data_base->array_stec);
+      }
       free_list_t(data_base->stec_deallocated_memory);
       free_list_t(data_base->array_stec_deallocated_memory);
       return EXIT;
@@ -310,7 +313,25 @@ int handle_manu(base_t *data_base)
     };
     case 14:
     {
-      return EXIT;
+      if (!data_base->array_stec)
+      {
+        printf("Необходимо инициализировать стек. Сначала обратитесь к пункту 8.\n");
+        return OK;
+      }
+
+      if (data_base->array_stec->start_pointer == data_base->array_stec->current_position_pointer)
+      {
+        printf("СТЕК пуст!\n");
+        return OK;
+      }
+
+      uint64_t t1 = tick();
+      solve_case_array_stec_t(stdout, data_base->array_stec);
+      uint64_t t2 = tick();
+
+      printf("\nВремя выполнения пункта (в тактах) : %"PRIu64"\n", t2 - t1);
+
+      return OK;
     };
     case 15:
     {
