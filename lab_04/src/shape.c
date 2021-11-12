@@ -37,7 +37,7 @@ void print_wellcome_menu(void)
   printf("13. [МАССИВ] Сбросить список освобожденных обласей;\n");
   printf("14. [МАССИВ] Распечатать слова в обратном порядке в перевернутом виде;\n");
   printf("\n");
-  printf("15. Сгенерировать статистику на по одной размерности;\n");
+  printf("15. Сгенерировать статистику по одной размерности;\n");
   printf("16. Вывести готовую статистику из файла ('statistics.txt');\n");
   printf("\n");
   printf(" 0. Выход.\n");
@@ -335,11 +335,140 @@ int handle_manu(base_t *data_base)
     };
     case 15:
     {
-      return EXIT;
+      int got_sq_len = 0;
+      int sq_len;
+
+      FILE *f = fopen("rubbish.txt", "wt");
+
+      printf("Введите количество повторений замеров (от %d до %d) :\n", MIN_REPITIONS_AMOUNT, MAX_REPITIONS_AMOUNT);
+
+      while (!got_sq_len)
+      {
+        if (!scanf("%d", &sq_len))
+        {
+          skip_stdin();
+          printf("Неверно введено количество замеров. Повторите ввод:\n");
+          got_sq_len = 0;
+          continue;
+        }
+
+        if (sq_len > MAX_REPITIONS_AMOUNT || sq_len < MIN_REPITIONS_AMOUNT)
+        {
+          skip_stdin();
+          printf("Неверно введено количество замеров. Повторите ввод:\n");
+          got_sq_len = 0;
+          continue;
+        }
+
+        got_sq_len = 1;
+      }
+
+      int got_stec_len = 0;
+      int stec_len;
+
+      printf("Введите размер стеков для замеров (от %d до %d) :\n", MIN_STEC_LEN, MAX_STEC_LEN);
+
+      while (!got_stec_len)
+      {
+        if (!scanf("%d", &stec_len))
+        {
+          skip_stdin();
+          printf("Неверно введен размер стека. Повторите ввод:\n");
+          got_stec_len = 0;
+          continue;
+        }
+
+        if (stec_len > MAX_STEC_LEN || stec_len < MIN_STEC_LEN)
+        {
+          skip_stdin();
+          printf("Неверно введен размер стека. Повторите ввод:\n");
+          got_stec_len = 0;
+          continue;
+        }
+
+        got_stec_len = 1;
+      }
+
+      uint64_t total_stec_time = 0;
+      uint64_t total_array_stec_time = 0;
+
+      uint64_t t1, t2;
+
+      string_t data = {TEST_STRING, sizeof(TEST_STRING) + 1};
+
+      for (int i = 0; i < sq_len; i++)
+      {
+
+        stec_t *stec = new_stec_t();
+        array_stec_t *array_stec = new_array_stec_t((size_t) stec_len);
+
+
+        for (int i = 0; i < stec_len; i++)
+        {
+            push_stec_t(stec, &data);
+            push_array_stec_t(array_stec, &data);
+        }
+
+
+        t1 = tick();
+        solve_case_stec_t(f, stec);
+        t2 = tick();
+        total_stec_time += t2 - t1;
+
+
+        t1 = tick();
+        solve_case_array_stec_t(f, array_stec);
+        t2 = tick();
+        total_array_stec_time += t2 - t1;
+
+
+
+        free(array_stec->start_pointer);
+        free(array_stec);
+
+        stec_note_t* p = stec->current_note;
+        while (p)
+        {
+          stec_note_t* np = p->previous;
+          free(p);
+          p = np;
+        }
+        free(stec);
+        fclose(f);
+
+      }
+
+      uint64_t average_stec_time = total_stec_time / sq_len;
+      uint64_t average_array_stec_time = total_array_stec_time / sq_len;
+
+      size_t used_bytes_amount_stec_t = sizeof(stec_t) + sizeof(stec_note_t) * ((size_t) stec_len);
+      size_t used_bytes_amount_array_stec_t = sizeof(array_stec_t) + sizeof(void*) * ((size_t) stec_len);
+
+      printf("\n");
+      printf("На %d повторениях для СТЕКа среднее время получилось: %"PRIu64" (в тактах)\n", sq_len, average_stec_time);
+      printf("Затраченная память (без учета памяти, необходимой для хранения строк) : %zu\n", used_bytes_amount_stec_t);
+      printf("\n");
+      printf("На %d повторениях для МАССИВАа среднее время получилось: %"PRIu64" (в тактах)\n", sq_len, average_array_stec_time);
+      printf("Затраченная память (без учета памяти, необходимой для хранения строк) : %zu\n", used_bytes_amount_array_stec_t);
+
+      return OK;
     };
     case 16:
     {
-      return EXIT;
+      FILE *f = fopen(STATISTICS_FILE_NAME, "rt");
+      if (!f) return ERROR;
+
+      printf("\n Информация из 'statistics.txt':\n\n");
+
+      line_t line;
+      while (fgets(line, LINE_LEN, f))
+          printf("%s", line);
+
+      fclose(f);
+
+      printf("\n");
+
+      return OK;
     };
   }
 

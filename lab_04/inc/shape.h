@@ -34,4 +34,16 @@ void print_line(void);
 
 #define MAX_ARRAY_STEC_LEN 128
 
+#define MAX_REPITIONS_AMOUNT 1000
+#define MIN_REPITIONS_AMOUNT 1
+
+#define MAX_STEC_LEN 1000
+#define MIN_STEC_LEN 1
+
+#define TEST_STRING "shlasashaposhosse"
+
+#define LINE_LEN 1024
+#define STATISTICS_FILE_NAME "statistics.txt"
+typedef char line_t[LINE_LEN];
+
 #endif
