@@ -446,10 +446,10 @@ int handle_manu(base_t *data_base)
 
       printf("\n");
       printf("На %d повторениях для СТЕКа среднее время получилось: %"PRIu64" (в тактах)\n", sq_len, average_stec_time);
-      printf("Затраченная память (без учета памяти, необходимой для хранения строк) : %zu\n", used_bytes_amount_stec_t);
+      printf("Затраченная память (без учета памяти, необходимой для хранения строк) : %zu (в байтах)\n", used_bytes_amount_stec_t);
       printf("\n");
       printf("На %d повторениях для МАССИВАа среднее время получилось: %"PRIu64" (в тактах)\n", sq_len, average_array_stec_time);
-      printf("Затраченная память (без учета памяти, необходимой для хранения строк) : %zu\n", used_bytes_amount_array_stec_t);
+      printf("Затраченная память (без учета памяти, необходимой для хранения строк) : %zu (в байтах)\n", used_bytes_amount_array_stec_t);
 
       return OK;
     };
@@ -466,7 +466,7 @@ int handle_manu(base_t *data_base)
 
       fclose(f);
 
-      printf("\n");
+      printf("\n\n");
 
       return OK;
     };

@@ -40,7 +40,7 @@ void print_line(void);
 #define MAX_STEC_LEN 1000
 #define MIN_STEC_LEN 1
 
-#define TEST_STRING "shlasashaposhosse"
+#define TEST_STRING "abcdefghijk"
 
 #define LINE_LEN 1024
 #define STATISTICS_FILE_NAME "statistics.txt"
