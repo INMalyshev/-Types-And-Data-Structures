@@ -26,7 +26,7 @@ void print_wellcome_menu(void)
   printf(" 3. [СПИСОК] Вывести состояние стека;\n");
   printf(" 4. [СПИСОК] Вывести список освобожденных областей;\n");
   printf(" 5. [СПИСОК] Очистить стек;\n");
-  printf(" 6. [СПИСОК] Сбросить список освобожденных обласей;\n");
+  printf(" 6. [СПИСОК] Сбросить список освобожденных областей;\n");
   printf(" 7. [СПИСОК] Распечатать слова в обратном порядке в перевернутом виде;\n");
   printf("\n");
   printf(" 8. [МАССИВ] Добавить элемент в стек (push);\n");
@@ -34,7 +34,7 @@ void print_wellcome_menu(void)
   printf("10. [МАССИВ] Вывести состояние стека;\n");
   printf("11. [МАССИВ] Вывести список освобожденных областей;\n");
   printf("12. [МАССИВ] Сбросить стек;\n");
-  printf("13. [МАССИВ] Сбросить список освобожденных обласей;\n");
+  printf("13. [МАССИВ] Сбросить список освобожденных областей;\n");
   printf("14. [МАССИВ] Распечатать слова в обратном порядке в перевернутом виде;\n");
   printf("\n");
   printf("15. Сгенерировать статистику по одной размерности;\n");
@@ -394,6 +394,51 @@ int handle_manu(base_t *data_base)
 
       uint64_t t1, t2;
 
+
+/* -------------------------------------------------------------------------- */
+      uint64_t avarage_push_stack_time = 0, average_pop_stack_time = 0;
+      uint64_t avarage_push_array_stack_time = 0, average_pop_array_stack_time = 0;
+
+      stack_t *stack = new_stack_t();
+      array_stack_t *array_stack = new_array_stack_t(1);
+
+      for (size_t i = 0; i < (size_t) sq_len; i++)
+      {
+        t1 = tick();
+        push_stack_t(stack, NULL);
+        t2 = tick();
+        avarage_push_stack_time += t2 - t1;
+
+        t1 = tick();
+        pop_stack_t(stack);
+        t2 = tick();
+        average_pop_stack_time += t2 - t1;
+
+        t1 = tick();
+        push_array_stack_t(array_stack, NULL);
+        t2 = tick();
+        avarage_push_array_stack_time += t2 - t1;
+
+        t1 = tick();
+        pop_array_stack_t(array_stack);
+        t2 = tick();
+        average_pop_array_stack_time += t2 - t1;
+      }
+
+      free(array_stack->start_pointer);
+      free(array_stack);
+
+      stack_note_t* p = stack->current_note;
+      while (p)
+      {
+        stack_note_t* np = p->previous;
+        free(p);
+        p = np;
+      }
+      free(stack);
+
+/* -------------------------------------------------------------------------- */
+
       string_t data = {TEST_STRING, sizeof(TEST_STRING) + 1};
 
       for (int i = 0; i < sq_len; i++)
@@ -401,7 +446,6 @@ int handle_manu(base_t *data_base)
 
         stack_t *stack = new_stack_t();
         array_stack_t *array_stack = new_array_stack_t((size_t) stack_len);
-
 
         for (int i = 0; i < stack_len; i++)
         {
@@ -440,17 +484,26 @@ int handle_manu(base_t *data_base)
       }
 
       uint64_t average_stack_time = total_stack_time / sq_len;
-      uint64_t average_array_stack_time = total_array_stack_time / sq_len;
-
       size_t used_bytes_amount_stack_t = sizeof(stack_t) + sizeof(stack_note_t) * ((size_t) stack_len);
+      avarage_push_stack_time /= sq_len;
+      average_pop_stack_time /= sq_len;
+
       size_t used_bytes_amount_array_stack_t = sizeof(array_stack_t) + sizeof(void*) * ((size_t) stack_len);
+      uint64_t average_array_stack_time = total_array_stack_time / sq_len;
+      avarage_push_array_stack_time /= sq_len;
+      average_pop_array_stack_time /= sq_len;
+
 
       printf("\n");
-      printf("На %d повторениях для СТЕКа среднее время получилось: %"PRIu64" (в тактах)\n", sq_len, average_stack_time);
+      printf("На %d повторениях для СТЕКа среднее время получилось : %"PRIu64" (в тактах)\n", sq_len, average_stack_time);
       printf("Затраченная память (без учета памяти, необходимой для хранения строк) : %zu (в байтах)\n", used_bytes_amount_stack_t);
+      printf("На %d повторениях для СТЕКа среднее время добавления получилось : %zu (в тактах)\n", sq_len, avarage_push_stack_time);
+      printf("На %d повторениях для СТЕКа среднее время удаления получилось : %zu (в тактах)\n", sq_len, average_pop_stack_time);
       printf("\n");
-      printf("На %d повторениях для МАССИВАа среднее время получилось: %"PRIu64" (в тактах)\n", sq_len, average_array_stack_time);
+      printf("На %d повторениях для МАССИВАа среднее время получилось : %"PRIu64" (в тактах)\n", sq_len, average_array_stack_time);
       printf("Затраченная память (без учета памяти, необходимой для хранения строк) : %zu (в байтах)\n", used_bytes_amount_array_stack_t);
+      printf("На %d повторениях для МАССИВАа среднее время добавления получилось : %zu (в тактах)\n", sq_len, avarage_push_array_stack_time);
+      printf("На %d повторениях для МАССИВАа среднее время удаления получилось : %zu (в тактах)\n", sq_len, average_pop_array_stack_time);
 
       return OK;
     };

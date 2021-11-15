@@ -42,8 +42,8 @@ void print_line(void);
 
 #define TEST_STRING "abcdefghijk"
 
-#define LINE_LEN 1024
 #define STATISTICS_FILE_NAME "statistics.txt"
+#define LINE_LEN 1024
 typedef char line_t[LINE_LEN];
 
 #define RUBBISH_FILE_NAME "rubbish.txt"
