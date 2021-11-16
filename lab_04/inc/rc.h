@@ -9,8 +9,11 @@
 #define NO_STRING 122
 #define BLANK_STRING 123
 
-/* stec.h */
-#define STECK_IS_EMPTY 40
+/* stack.h */
+#define STACK_IS_EMPTY 40
+
+/* array_stack.h */
+#define STACK_IS_FULL 41
 
 /* shape */
 #define EXIT 1
