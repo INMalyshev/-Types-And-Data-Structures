@@ -230,6 +230,7 @@ int handle_manu(base_t *data_base)
       {
         if  (OK != scan_string_t(string, stdin))
         {
+          skip_stdin();
           printf("Ошибка ввода. Введите слово заново:\n");
           continue;
         }
