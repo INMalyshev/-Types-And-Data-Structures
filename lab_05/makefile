@@ -2,10 +2,10 @@ CC := gcc
 
 CFLAGS := -std=c99 -Werror -Wall -Wextra -Wpedantic -Wfloat-equal -Wfloat-conversion -Wvla -pedantic
 
-app.exe : main.o
+app.exe : main.o simulation.o queue.o
 	$(CC) -o $@ $^ $(COV)
 
-main.o : src/main.c
+main.o : src/main.c inc/simulation.h
 	$(CC) -Iinc $(CFLAGS) -c $<
 
 simulation.o : src/simulation.c inc/simulation.h inc/rc.h inc/queue.h

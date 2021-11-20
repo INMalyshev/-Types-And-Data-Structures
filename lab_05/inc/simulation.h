@@ -7,11 +7,10 @@
 
 typedef struct
 {
-  int position;
-  double new_position_time;
+  double time_point;
 } request_t;
 
-void *new_request_t(void);
+void *new_request_t(double time_point);
 void free_request_t(void *request);
 
 #define EPS 1e-6
@@ -24,8 +23,11 @@ int my_chance(double probability);
 
 #define T1_1 0
 #define T1_2 6
+#define T2_2 1
 #define P 0.8
 
 #define REQUIRED_REQUESTS_OUT 1000
+
+void simulate_with_queue(void);
 
 #endif

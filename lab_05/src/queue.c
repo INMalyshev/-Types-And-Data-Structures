@@ -11,6 +11,7 @@ int push_queue_t(queue_t *queue, void *data)
 
   new_note->previous_note = queue->queue_head;
   queue->queue_head = new_note;
+  queue->len++;
 
   return OK;
 }
@@ -22,6 +23,7 @@ queue_note_t *pop_queue_t(queue_t *queue)
   if (!note) return note;
 
   queue->queue_head = note->previous_note;
+  queue->len--;
 
   return note;
 }
