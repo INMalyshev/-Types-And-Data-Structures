@@ -29,5 +29,6 @@ int my_chance(double probability);
 #define REQUIRED_REQUESTS_OUT 1000
 
 void simulate_with_queue(void);
+void simulate_with_array_queue(void);
 
 #endif
