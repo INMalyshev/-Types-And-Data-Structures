@@ -3,19 +3,18 @@
 #include <inttypes.h>
 #include <stdlib.h>
 
-#include "simulation.h"
-#include "tick.h"
+#include "shape.h"
+#include "rc.h"
 
 int main(void)
 {
   setbuf(stdout, NULL);
 
-  uint64_t t = tick();
-  printf("%"PRIu64"\n", t);
-  srand(t);
+  while (handle_manu() == OK);
 
-  simulate_with_queue();
-  simulate_with_array_queue();
+  printf("Программа завершена.");
+
+  return OK;
 
   return 0;
 }

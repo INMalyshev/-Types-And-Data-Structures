@@ -8,6 +8,8 @@
 
 double my_rand_double(int alpha, int betta)
 {
+  if (alpha == betta) return (double) alpha;
+
   double gamma = (double) alpha;
   int range = betta - alpha;
 
@@ -42,7 +44,7 @@ void free_request_t(void *request)
   free(request);
 }
 
-void simulate_with_queue(void)
+void simulate_with_queue(int t1_1, int t1_2, int t2_1, int t2_2, double p, int n)
 {
   double timeline = 0.0;
   queue_t queue = {NULL, 0};
@@ -62,7 +64,7 @@ void simulate_with_queue(void)
   printf("Начало моделирования.\n");
   printf("%s %s %s\n", "Обработано запросов", "Текущая длина очереди", "Средняя длина очереди");
 
-  while (REQUIRED_REQUESTS_OUT > requests_out)
+  while (n > requests_out)
   {
     /* Вывод информации о системе */
     if (processed_requests >= 100 && processed_requests % 100 == 0 && !report_is_done)
@@ -79,7 +81,7 @@ void simulate_with_queue(void)
     /* Если в очереди не ожидается поступления нового request, он создается */
     if (!preparing_request)
     {
-      double time_point = timeline + my_rand_double(T1_1, T1_2);
+      double time_point = timeline + my_rand_double(t1_1, t1_2);
       preparing_request = new_request_t(time_point);
     }
 
@@ -97,7 +99,7 @@ void simulate_with_queue(void)
     {
       if (processing_request->time_point - timeline < EPS)
       {
-        if (my_chance(P))
+        if (my_chance(p))
         {
           push_queue_t(&queue, processing_request);
           processing_request = NULL;
@@ -110,7 +112,7 @@ void simulate_with_queue(void)
           requests_out++;
           processed_requests++;
           total_lifetime += timeline;
-          if (requests_out == REQUIRED_REQUESTS_OUT) break;
+          if (requests_out == n) break;
         }
       }
     }
@@ -122,7 +124,7 @@ void simulate_with_queue(void)
       queue_note_t *head_note = pop_queue_t(&queue);
       if (head_note)
       {
-        double time_point = timeline + my_rand_double(T1_1, T2_2);
+        double time_point = timeline + my_rand_double(t2_1, t2_2);
         processing_request = head_note->data;
         processing_request->time_point = time_point;
         total_lifetime -= time_point - timeline;
@@ -157,7 +159,7 @@ void simulate_with_queue(void)
   printf("Количество срабатываний ОА :                %d\n\n", processed_requests);
 }
 
-void simulate_with_array_queue(void)
+void simulate_with_array_queue(int t1_1, int t1_2, int t2_1, int t2_2, double p, int n)
 {
   double timeline = 0.0;
   array_queue_t queue = new_array_queue_t();
@@ -178,7 +180,7 @@ void simulate_with_array_queue(void)
   printf("Начало моделирования.\n");
   printf("%s %s %s\n", "Обработано запросов", "Текущая длина очереди", "Средняя длина очереди");
 
-  while (REQUIRED_REQUESTS_OUT > requests_out)
+  while (n > requests_out)
   {
     /* Вывод информации о системе */
     if (processed_requests >= 100 && processed_requests % 100 == 0 && !report_is_done)
@@ -195,7 +197,7 @@ void simulate_with_array_queue(void)
     /* Если в очереди не ожидается поступления нового request, он создается */
     if (!preparing_request)
     {
-      double time_point = timeline + my_rand_double(T1_1, T1_2);
+      double time_point = timeline + my_rand_double(t1_1, t1_2);
       preparing_request = new_request_t(time_point);
     }
 
@@ -216,7 +218,7 @@ void simulate_with_array_queue(void)
     {
       if (processing_request->time_point - timeline < EPS)
       {
-        if (my_chance(P))
+        if (my_chance(p))
         {
           // printf("[DBG] try push 2\n");
           push_array_queue_t(queue, processing_request);
@@ -232,7 +234,7 @@ void simulate_with_array_queue(void)
           requests_out++;
           processed_requests++;
           total_lifetime += timeline;
-          if (requests_out == REQUIRED_REQUESTS_OUT) break;
+          if (requests_out == n) break;
         }
       }
     }
@@ -247,7 +249,7 @@ void simulate_with_array_queue(void)
       if (head_request)
       {
         len--;
-        double time_point = timeline + my_rand_double(T1_1, T2_2);
+        double time_point = timeline + my_rand_double(t2_1, t2_2);
         processing_request = head_request;
         processing_request->time_point = time_point;
         total_lifetime -= time_point - timeline;
