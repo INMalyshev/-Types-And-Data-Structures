@@ -1,7 +1,7 @@
 #ifndef ARRAY_QUEUE_H
 #define ARRAY_QUEUE_H
 
-#define ARRAY_QUEUE_LEN 100
+#define ARRAY_QUEUE_LEN 10001
 typedef void** array_queue_t;
 
 void free_array_queue_t(array_queue_t array_queue);

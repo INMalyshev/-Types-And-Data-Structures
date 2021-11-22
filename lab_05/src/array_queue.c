@@ -15,7 +15,7 @@ void *pop_array_queue_t(array_queue_t array_queue)
 {
   void* data = array_queue[0];
 
-  for (size_t i = 0; i < ARRAY_QUEUE_LEN - 1; i++)
+  for (size_t i = 0; i < ARRAY_QUEUE_LEN - 1 && array_queue[i]; i++)
     array_queue[i] = (void*) array_queue[i+1];
 
   array_queue[ARRAY_QUEUE_LEN - 1] = NULL;
