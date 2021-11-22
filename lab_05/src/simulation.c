@@ -162,7 +162,7 @@ void simulate_with_queue(int t1_1, int t1_2, int t2_1, int t2_2, double p, int n
 void simulate_with_array_queue(int t1_1, int t1_2, int t2_1, int t2_2, double p, int n)
 {
   double timeline = 0.0;
-  array_queue_t queue = new_array_queue_t();
+  array_queue_t *queue = new_array_queue_t();
   request_t *preparing_request = NULL;
   request_t *processing_request = NULL;
 
@@ -175,7 +175,6 @@ void simulate_with_array_queue(int t1_1, int t1_2, int t2_1, int t2_2, double p,
   double free_processor = 0.0;
   double total_queue_len = 0.0;
   int iteration_amount = 0;
-  int len = 0;
 
   printf("Начало моделирования.\n");
   printf("%s %s %s\n", "Обработано запросов", "Текущая длина очереди", "Средняя длина очереди");
@@ -185,7 +184,7 @@ void simulate_with_array_queue(int t1_1, int t1_2, int t2_1, int t2_2, double p,
     /* Вывод информации о системе */
     if (processed_requests >= 100 && processed_requests % 100 == 0 && !report_is_done)
     {
-      printf("%-20.1d%-22.1d%-22.3lf\n", processed_requests, len, total_queue_len / iteration_amount);
+      printf("%-20.1d%-22.1d%-22.3lf\n", processed_requests, queue->len, total_queue_len / iteration_amount);
       report_is_done = 1;
     }
 
@@ -207,7 +206,6 @@ void simulate_with_array_queue(int t1_1, int t1_2, int t2_1, int t2_2, double p,
       // printf("[DBG] try push 1\n");
       push_array_queue_t(queue, preparing_request);
       // printf("[DBG] push 1\n");
-      len++;
       total_lifetime -= preparing_request->time_point;
       preparing_request = NULL;
       requests_in++;
@@ -223,7 +221,6 @@ void simulate_with_array_queue(int t1_1, int t1_2, int t2_1, int t2_2, double p,
           // printf("[DBG] try push 2\n");
           push_array_queue_t(queue, processing_request);
           // printf("[DBG] push 2\n");
-          len++;
           processing_request = NULL;
           processed_requests++;
         }
@@ -248,7 +245,6 @@ void simulate_with_array_queue(int t1_1, int t1_2, int t2_1, int t2_2, double p,
       // printf("[DBG] pop %d\n", len);
       if (head_request)
       {
-        len--;
         double time_point = timeline + my_rand_double(t2_1, t2_2);
         processing_request = head_request;
         processing_request->time_point = time_point;
@@ -262,12 +258,12 @@ void simulate_with_array_queue(int t1_1, int t1_2, int t2_1, int t2_2, double p,
 
     /* Сдвиг показателей системы */
     timeline += STEP;
-    total_queue_len += len;
+    total_queue_len += queue->len;
     iteration_amount++;
   }
   printf("Конец моделирования.\n\n");
 
-  total_lifetime += timeline * len;
+  total_lifetime += timeline * queue->len;
 
   double average_life_time = total_lifetime / requests_in;
 

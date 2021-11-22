@@ -398,8 +398,6 @@ int handle_manu(void)
         glen = 1;
       }
 
-      int only_to_be_pointed;
-
       printf("\nОчередь-список:\n\n");
 
       queue_t queue = {NULL, 0};
@@ -407,13 +405,13 @@ int handle_manu(void)
 
       for (int i = 0; i < len; i++)
       {
-        push_queue_t(&queue, &only_to_be_pointed);
+        push_queue_t(&queue, NULL);
       }
 
       for (size_t i = 0; i < 1000; i++)
       {
         t1 = tick();
-        push_queue_t(&queue, &only_to_be_pointed);
+        push_queue_t(&queue, NULL);
         t2 = tick();
         push_sum += t2 - t1;
 
@@ -431,19 +429,19 @@ int handle_manu(void)
 
       printf("\nОчередь-мвссив:\n\n");
 
-      array_queue_t array_queue = new_array_queue_t();
+      array_queue_t *array_queue = new_array_queue_t();
       push_sum = 0;
       pop_sum = 0;
 
       for (int i = 0; i < len; i++)
       {
-        push_array_queue_t(array_queue, &only_to_be_pointed);
+        push_array_queue_t(array_queue, NULL);
       }
 
       for (size_t i = 0; i < 1000; i++)
       {
         t1 = tick();
-        push_array_queue_t(array_queue, &only_to_be_pointed);
+        push_array_queue_t(array_queue, NULL);
         t2 = tick();
         push_sum += t2 - t1;
 
