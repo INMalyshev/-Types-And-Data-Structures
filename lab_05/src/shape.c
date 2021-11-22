@@ -24,6 +24,7 @@ void print_wellcome_menu(void)
   printf(" 1. [ОЧЕРЕДЬ-СПИСОК] Провести моделированиие;\n");
   printf(" 2. [ОЧЕРЕДЬ-МАССИВ] Провести моделированиие;\n");
   printf(" 3. Сгенерировать статистику по работе двух реализаций очереди;\n");
+  printf(" 4. Вывести готовую статистику из файла ('statistics.txt');\n");
   printf("\n");
   printf(" 0. Выход.\n");
 }
@@ -46,7 +47,7 @@ int handle_manu(void)
       skip_stdin();
       continue;
     }
-    if (choice < 0 || choice > 3)
+    if (choice < 0 || choice > 4)
     {
       printf("Неправильный ввод. Запрос на повторный ввод:\n");
       continue;
@@ -195,6 +196,13 @@ int handle_manu(void)
           if (p <= 0.0 || p >= 1.0)
           {
             printf("Введены неверные данные. Повториите ввод.\n");
+            skip_stdin();
+            continue;
+          }
+
+          if (p < 0.1)
+          {
+            printf("Введено слишком маленькое значение. Повториите ввод.\n");
             skip_stdin();
             continue;
           }
@@ -355,6 +363,14 @@ int handle_manu(void)
             continue;
           }
 
+          if (p < 0.1)
+          {
+            printf("Введено слишком маленькое значение. Повториите ввод.\n");
+            skip_stdin();
+            continue;
+          }
+
+
           flag = 1;
         }
 
@@ -451,11 +467,29 @@ int handle_manu(void)
         pop_sum += t2 - t1;
       }
 
-      size = sizeof(void*) * len;
+      size = sizeof(array_queue_t) + sizeof(void*) * len;
 
       printf("  Среднее время добавления элемента: %d (в тактах)\n", (int) (push_sum / 1000));
       printf("  Среднее время извлечения элемента: %d (в тактах)\n", (int) (pop_sum / 1000));
       printf("  Память затраченая на хранение структуры: %d (в байтах)\n\n", (int) size);
+
+      return OK;
+    };
+
+    case 4:
+    {
+      FILE *f = fopen(STATISTICS_FILE_NAME, "rt");
+      if (!f) return ERROR;
+
+      printf("\n Информация из 'statistics.txt':\n\n");
+
+      line_t line;
+      while (fgets(line, LINE_LEN, f))
+          printf("%s", line);
+
+      fclose(f);
+
+      printf("\n\n");
 
       return OK;
     };

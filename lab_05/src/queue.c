@@ -13,13 +13,14 @@ int push_queue_t(queue_t *queue, void *data)
   if (!p)
   {
     queue->queue_head = new_note;
+    queue->len = 1;
     return OK;
   }
 
   for (; p->previous_note; p = p->previous_note);
 
   p->previous_note = new_note;
-  
+
   queue->len++;
 
   return OK;
@@ -27,12 +28,16 @@ int push_queue_t(queue_t *queue, void *data)
 
 queue_note_t *pop_queue_t(queue_t *queue)
 {
-  queue_note_t *note = queue->queue_head;
+  if (0 == queue->len)
+  {
+      return NULL;
+  }
 
-  if (!note) return note;
+  queue_note_t *note = queue->queue_head;
 
   queue->queue_head = note->previous_note;
   queue->len--;
+  
 
   return note;
 }
