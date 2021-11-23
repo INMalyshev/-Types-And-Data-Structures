@@ -24,7 +24,7 @@ void print_wellcome_menu(void)
   printf(" 1. [ОЧЕРЕДЬ-СПИСОК] Провести моделированиие;\n");
   printf(" 2. [ОЧЕРЕДЬ-МАССИВ] Провести моделированиие;\n");
   printf(" 3. Сгенерировать статистику по работе двух реализаций очереди;\n");
-  printf(" 4. Вывести готовую статистику из файла ('statistics.txt');\n");
+  // printf(" 4. Вывести готовую статистику из файла ('statistics.txt');\n");
   printf("\n");
   printf(" 0. Выход.\n");
 }
@@ -47,7 +47,7 @@ int handle_manu(void)
       skip_stdin();
       continue;
     }
-    if (choice < 0 || choice > 4)
+    if (choice < 0 || choice > 3)
     {
       printf("Неправильный ввод. Запрос на повторный ввод:\n");
       continue;
@@ -476,23 +476,23 @@ int handle_manu(void)
       return OK;
     };
 
-    case 4:
-    {
-      FILE *f = fopen(STATISTICS_FILE_NAME, "rt");
-      if (!f) return ERROR;
-
-      printf("\n Информация из 'statistics.txt':\n\n");
-
-      line_t line;
-      while (fgets(line, LINE_LEN, f))
-          printf("%s", line);
-
-      fclose(f);
-
-      printf("\n\n");
-
-      return OK;
-    };
+    // case 4:
+    // {
+    //   FILE *f = fopen(STATISTICS_FILE_NAME, "rt");
+    //   if (!f) return ERROR;
+    //
+    //   printf("\n Информация из 'statistics.txt':\n\n");
+    //
+    //   line_t line;
+    //   while (fgets(line, LINE_LEN, f))
+    //       printf("%s", line);
+    //
+    //   fclose(f);
+    //
+    //   printf("\n\n");
+    //
+    //   return OK;
+    // };
   }
 
 
