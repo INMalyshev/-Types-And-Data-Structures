@@ -7,10 +7,15 @@ iht_t *new_iht_t(int nmemb)
 {
   iht_t *iht = malloc(sizeof(iht_t));
 
-  iht->data = calloc(nmemb, sizeof(iht_elem_t));
+  iht->data = malloc(nmemb * sizeof(iht_elem_t));
   iht->allocated = nmemb;
   iht->elem_amount = 0;
   iht->factor_number = nmemb;
+
+  for (int i = 0; i < iht->allocated; i++)
+  {
+    iht->data[i].free = 1;
+  }
 
   return iht;
 }
@@ -27,7 +32,8 @@ iht_t *add_iht_t(iht_t *iht, int alpha)
       {
         iht->data[i].value = alpha;
         iht->data[i].free = 0;
-        iht->elem_amount++;
+        iht->elem_amount += 1;
+        break;
       }
     }
   }
