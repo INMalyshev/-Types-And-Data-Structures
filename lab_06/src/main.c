@@ -45,11 +45,15 @@ int main(int argc, char **argv)
     add_bt_t(bt, tf.data[i]);
   }
 
+  fix_height_bt_t(bt);
   pri_bt_t(bt);
+
+  // printf("[DBG] HEIGHT : %d\n\n", get_height_bt_node_t(bt->root, -1));
 
   printf("\nDeleting elements.\n\n");
 
   del_bt_t(bt, 1);
+  fix_height_bt_t(bt);
   pri_bt_t(bt);
 
   printf("\n\nSuccess!\n");

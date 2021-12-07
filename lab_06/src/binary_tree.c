@@ -39,27 +39,6 @@ bt_node_t *find_bt_node_t(bt_node_t *root, int alpha, int *buf)
   }
 }
 
-// bt_node_t *find_root_bt_node_t(bt_node_t *root, int alpha)
-// {
-//   if (!root)
-//   {
-//     return NULL;
-//   }
-//
-//   if (alpha < root->value)
-//   {
-//     return find_root_bt_node_t(root->left, alpha);
-//   }
-//   else if ((root->left && alpha == root->left->value) || (root->right &&  alpha == root->right->value))
-//   {
-//     return root;
-//   }
-//   else
-//   {
-//     return find_root_bt_node_t(root->right, alpha);
-//   }
-// }
-
 bt_node_t *new_bt_node_t(int alpha)
 {
   bt_node_t *new = malloc(sizeof(bt_node_t));
@@ -105,8 +84,9 @@ void pri_bt_node_t(bt_node_t *root)
   printf("<value: %d", root->value);
   if (1 < root->count) printf(", amount: %d", root->count);
   printf(">");
-  if (root->left) printf(" <son: %d>", root->left->value);
-  if (root->right) printf(" <son: %d>", root->right->value);
+  if (root->left) printf(" <lson: %d>", root->left->value);
+  if (root->right) printf(" <rson: %d>", root->right->value);
+  // printf(" <[DBG] h = %d>", root->height);
   printf("\n");
 
   pri_bt_node_t(root->left);
@@ -137,55 +117,8 @@ void pri_bt_t(bt_t *bt)
   pri_bt_node_t(bt->root);
 }
 
-// void del_pb_node_t(bt_node_t **p, int x)
-// {
-//   if (NULL == *p)
-//   {
-//     printf("Nothing found.\n");
-//     return;
-//   }
-//
-//   else if ((*p)->value < x)
-//   {
-//     del_pb_node_t(&((*p)->left), x);
-//   }
-//
-//   else if ((*p)->value > x)
-//   {
-//     del_pb_node_t(&((*p)->right), x);
-//   }
-//
-//   else
-//   {
-//     if (!(*p)->left && !(*p)->right)
-//     {
-//       free(*p);
-//       *p = NULL;
-//     }
-//
-//     else if ((*p)->left && !(*p)->right)
-//     {
-//       void *tofree = *p;
-//       *p = (*p)->left;
-//       free(tofree);
-//     }
-//
-//     else if (!(*p)->left && (*p)->right)
-//     {
-//       void *tofree = *p;
-//       *p = (*p)->right;
-//       free(tofree);
-//     }
-//
-//     else
-//     {
-//       printf("todo");
-//     }
-//   }
-// }
-
 /* Возвращает указатель на "вырванный" из дерева элемент (без очистки) */
-bt_node_t* del_pb_node_t(bt_node_t *root, bt_node_t *current, int value, bt_t *tree)
+bt_node_t* del_bt_node_t(bt_node_t *root, bt_node_t *current, int value, bt_t *tree)
 {
   if (!current)
   {
@@ -194,12 +127,12 @@ bt_node_t* del_pb_node_t(bt_node_t *root, bt_node_t *current, int value, bt_t *t
 
   else if (value < current->value)
   {
-    return del_pb_node_t(current, current->left, value, tree);
+    return del_bt_node_t(current, current->left, value, tree);
   }
 
   else if (value > current->value)
   {
-    return del_pb_node_t(current, current->right, value, tree);
+    return del_bt_node_t(current, current->right, value, tree);
   }
 
   else
@@ -308,7 +241,7 @@ bt_node_t* del_pb_node_t(bt_node_t *root, bt_node_t *current, int value, bt_t *t
 
 void del_bt_t(bt_t *tree, int value)
 {
-  bt_node_t *removed_node = del_pb_node_t(NULL, tree->root, value, tree);
+  bt_node_t *removed_node = del_bt_node_t(NULL, tree->root, value, tree);
   if (!removed_node)
   {
     printf("Nothing found.\n");
@@ -318,4 +251,33 @@ void del_bt_t(bt_t *tree, int value)
   free(removed_node);
 
   printf("Success\n");
+}
+
+int get_height_bt_node_t(bt_node_t *root, int s)
+{
+  if (!root)
+    return s;
+
+  s += 1;
+
+  int h1 = get_height_bt_node_t(root->left, s);
+  int h2 = get_height_bt_node_t(root->right, s);
+
+  return (h1 > h2) ? h1 : h2;
+}
+
+void fix_height_bt_node_t(bt_node_t *root, int s)
+{
+  if (!root) return;
+
+  root->height = s;
+
+  fix_height_bt_node_t(root->left, s-1);
+  fix_height_bt_node_t(root->right, s-1);
+}
+
+void fix_height_bt_t(bt_t *tree)
+{
+  int h = get_height_bt_node_t(tree->root, -1);
+  fix_height_bt_node_t(tree->root, h);
 }
