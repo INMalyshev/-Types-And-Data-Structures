@@ -3,93 +3,93 @@
 
 #include "interior_hash_table.h"
 
-iht_t *new_iht_t(int nmemb)
+table_t *new_table_t(int nmemb)
 {
-  iht_t *iht = malloc(sizeof(iht_t));
+  table_t *table = malloc(sizeof(table_t));
 
-  iht->data = malloc(nmemb * sizeof(iht_elem_t));
-  iht->allocated = nmemb;
-  iht->elem_amount = 0;
-  iht->factor_number = nmemb;
+  table->data = malloc(nmemb * sizeof(element_t));
+  table->allocated = nmemb;
+  table->elem_amount = 0;
+  table->factor_number = nmemb;
 
-  for (int i = 0; i < iht->allocated; i++)
+  for (int i = 0; i < table->allocated; i++)
   {
-    iht->data[i].free = 1;
+    table->data[i].free = 1;
   }
 
-  return iht;
+  return table;
 }
 
-iht_t *add_iht_t(iht_t *iht, int alpha)
+table_t *add_table_t(table_t *table, int alpha)
 {
-  if (iht->elem_amount < iht->allocated)
+  if (table->elem_amount < table->allocated)
   {
-    int index = alpha % iht->factor_number;
-    for (int j = 0; j < iht->allocated; j++)
+    int index = alpha % table->factor_number;
+    for (int j = 0; j < table->allocated; j++)
     {
-      int i = (index + j) % iht->factor_number;
-      if (iht->data[i].free)
+      int i = (index + j) % table->factor_number;
+      if (table->data[i].free)
       {
-        iht->data[i].value = alpha;
-        iht->data[i].free = 0;
-        iht->elem_amount += 1;
+        table->data[i].value = alpha;
+        table->data[i].free = 0;
+        table->elem_amount += 1;
         break;
       }
     }
   }
   else
   {
-    iht = refactor_iht_t(iht);
-    add_iht_t(iht, alpha);
+    table = refactor_table_t(table);
+    add_table_t(table, alpha);
   }
-  return iht;
+  return table;
 }
 
-void free_iht_t(iht_t *iht)
+void free_table_t(table_t *table)
 {
-  free(iht->data);
-  free(iht);
+  free(table->data);
+  free(table);
 }
 
-void pri_iht_t(iht_t *iht)
+void pri_table_t(table_t *table)
 {
-  printf("Interior hash table:\n\n");
-  if (0 == iht->elem_amount)
+  printf("\nInterior hash table:\n\n");
+  if (0 == table->elem_amount)
   {
     printf("Empty interior hash table.\n\n");
     return;
   }
-  for (int i = 0; i < iht->allocated; i++)
+  for (int i = 0; i < table->allocated; i++)
   {
-    if (!iht->data[i].free)
+    if (!table->data[i].free)
     {
-      printf("<index: %d> <value: %d>\n", i, iht->data[i].value);
+      printf("<index: %d> <value: %d>\n", i, table->data[i].value);
     }
   }
   printf("\n");
 }
 
-iht_elem_t *find_iht_t(iht_t *iht, int alpha, int *buf)
+element_t *find_table_t(table_t *table, int alpha, int *buf)
 {
   int counter = 0;
-  int index = alpha % iht->factor_number;
-  for (int j = 0; j < iht->allocated; j++)
+  int index = alpha % table->factor_number;
+  for (int j = 0; j < table->allocated; j++)
   {
     counter++;
-    int i = (index + j) % iht->factor_number;
-    if (!iht->data[i].free && alpha == iht->data[i].value)
+    int i = (index + j) % table->factor_number;
+    if (!table->data[i].free && alpha == table->data[i].value)
     {
       *buf = counter;
-      return &(iht->data[i]);
+      return &(table->data[i]);
     }
   }
   *buf = counter;
   return NULL;
 }
 
-void del_iht_t(iht_t *iht, int alpha, int *buf)
+void del_table_t(table_t *table, int alpha, int *buf)
 {
-  iht_elem_t *elem = find_iht_t(iht, alpha, buf);
+  element_t *elem = find_table_t(table, alpha, buf);
   if (!elem)
   {
     printf("Element is not found.\n");
@@ -98,16 +98,16 @@ void del_iht_t(iht_t *iht, int alpha, int *buf)
   elem->free = 1;
 }
 
-iht_t *refactor_iht_t(iht_t *iht)
+table_t *refactor_table_t(table_t *table)
 {
-  iht_t *new = new_iht_t(iht->allocated * ALLOCATION_FACTOR);
-  for (int i = 0; i < iht->allocated; i++)
+  table_t *new = new_table_t(table->allocated * ALLOCATION_FACTOR);
+  for (int i = 0; i < table->allocated; i++)
   {
-    if (!iht->data[i].free)
+    if (!table->data[i].free)
     {
-      add_iht_t(new, iht->data[i].value);
+      add_table_t(new, table->data[i].value);
     }
   }
-  free_iht_t(iht);
+  free_table_t(table);
   return new;
 }

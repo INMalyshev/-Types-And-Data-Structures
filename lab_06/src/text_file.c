@@ -3,19 +3,20 @@
 
 #include <text_file.h>
 
-int create_tf_t(char *filename, tf_t *textfile)
+text_file_t *create_text_file_t(char *filename)
 {
   FILE *f = fopen(filename, "rt");
-  if (!f) return 1;
+  if (!f) return NULL;
 
   int nmemb;
-  if (!fscanf(f, "%d", &nmemb)) return 1;
+  if (!fscanf(f, "%d", &nmemb)) return NULL;
 
+  text_file_t *textfile = malloc(sizeof(text_file_t));
   int *data = calloc(nmemb, sizeof(int));
 
   for (int i = 0; i < nmemb; i++)
   {
-    if (!fscanf(f, "%d", data + i)) return 1;
+    if (!fscanf(f, "%d", data + i)) return NULL;
   }
 
   fclose(f);
@@ -24,10 +25,10 @@ int create_tf_t(char *filename, tf_t *textfile)
   textfile->len = nmemb;
   textfile->data = data;
 
-  return 0;
+  return textfile;
 }
 
-int delete_tf_t(tf_t *textfile, int alpha)
+int delete_text_file_t(text_file_t *textfile, int alpha)
 {
   for (int i = 0; i < textfile->len; i++)
   {
@@ -61,7 +62,7 @@ int delete_tf_t(tf_t *textfile, int alpha)
   return 0;
 }
 
-void pri_tf_t(tf_t *tf)
+void pri_text_file_t(text_file_t *tf)
 {
   printf("Text file content:\n\n");
 
@@ -73,6 +74,6 @@ void pri_tf_t(tf_t *tf)
 
   for (int i = 0; i < tf->len; i++)
   {
-    printf("%d\n", tf->data[i]);
+    printf("<index: %d> <value: %d>\n", i, tf->data[i]);
   }
 }

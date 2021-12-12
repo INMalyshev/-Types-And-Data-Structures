@@ -3,20 +3,20 @@
 
 #include "binary_tree.h"
 
-void free_bt_node_t(bt_node_t *root)
+void free_node_t(node_t *root)
 {
-  if (root->left) free_bt_node_t(root->left);
-  if (root->right) free_bt_node_t(root->right);
+  if (root->left) free_node_t(root->left);
+  if (root->right) free_node_t(root->right);
   free(root);
 }
 
-void free_bt_t(bt_t *bt)
+void free_tree_t(tree_t *tree)
 {
-  free_bt_node_t(bt->root);
-  free(bt);
+  free_node_t(tree->root);
+  free(tree);
 }
 
-bt_node_t *find_bt_node_t(bt_node_t *root, int alpha, int *buf)
+node_t *find_node_t(node_t *root, int alpha, int *buf)
 {
   if (!root)
   {
@@ -26,7 +26,7 @@ bt_node_t *find_bt_node_t(bt_node_t *root, int alpha, int *buf)
   if (alpha < root->value)
   {
     *buf += 1;
-    return find_bt_node_t(root->left, alpha, buf);
+    return find_node_t(root->left, alpha, buf);
   }
   else if (alpha == root->value)
   {
@@ -35,90 +35,91 @@ bt_node_t *find_bt_node_t(bt_node_t *root, int alpha, int *buf)
   }
   else
   {
-    return find_bt_node_t(root->right, alpha, buf);
+    return find_node_t(root->right, alpha, buf);
   }
 }
 
-bt_node_t *new_bt_node_t(int alpha)
+node_t *new_node_t(int alpha)
 {
-  bt_node_t *new = malloc(sizeof(bt_node_t));
+  node_t *new = malloc(sizeof(node_t));
   new->value = alpha;
   new->left = NULL;
   new->right = NULL;
-  new->count = 1;
+  new->height = 1;
+  // new->count = 1;
 
   return new;
 }
 
-void add_bt_node_t(bt_node_t *root, int alpha)
+void add_node_t(node_t *root, int alpha)
 {
-  if (alpha < root->value)
+  if (alpha <= root->value)
   {
     if (!root->left)
     {
-      root->left = new_bt_node_t(alpha);
+      root->left = new_node_t(alpha);
       return;
     }
-    add_bt_node_t(root->left, alpha);
+    add_node_t(root->left, alpha);
   }
-  else if (alpha == root->value)
-  {
-    root->count += 1;
-    return;
-  }
+  // else if (alpha == root->value)
+  // {
+  //   root->count += 1;
+  //   return;
+  // }
   else
   {
     if (!root->right)
     {
-      root->right = new_bt_node_t(alpha);
+      root->right = new_node_t(alpha);
       return;
     }
-    add_bt_node_t(root->right, alpha);
+    add_node_t(root->right, alpha);
   }
 }
 
-void pri_bt_node_t(bt_node_t *root)
+void pri_node_t(node_t *root)
 {
   if (!root) return;
 
   printf("<value: %d", root->value);
-  if (1 < root->count) printf(", amount: %d", root->count);
+  // if (1 < root->count) printf(", amount: %d", root->count);
   printf(">");
   if (root->left) printf(" <lson: %d>", root->left->value);
   if (root->right) printf(" <rson: %d>", root->right->value);
   // printf(" <[DBG] h = %d>", root->height);
   printf("\n");
 
-  pri_bt_node_t(root->left);
-  pri_bt_node_t(root->right);
+  pri_node_t(root->left);
+  pri_node_t(root->right);
 }
 
-bt_t *new_bt_t(void)
+tree_t *new_tree_t(void)
 {
-  return calloc(1, sizeof(bt_t));
+  return calloc(1, sizeof(tree_t));
 }
 
-void add_bt_t(bt_t *bt, int alpha)
+void add_tree_t(tree_t *tree, int alpha)
 {
-  if (!bt->root) bt->root = new_bt_node_t(alpha);
-  else add_bt_node_t(bt->root, alpha);
+  if (!tree->root) tree->root = new_node_t(alpha);
+  else add_node_t(tree->root, alpha);
 }
 
-void pri_bt_t(bt_t *bt)
+void pri_tree_t(tree_t *tree)
 {
   printf("Binary search tree prefix form:\n\n");
 
-  if (!bt->root)
+  if (!tree->root)
   {
     printf("No nodes in tree.\n");
     return;
   }
 
-  pri_bt_node_t(bt->root);
+  pri_node_t(tree->root);
 }
 
 /* Возвращает указатель на "вырванный" из дерева элемент (без очистки) */
-bt_node_t* del_bt_node_t(bt_node_t *root, bt_node_t *current, int value, bt_t *tree)
+node_t* del_node_t(node_t *root, node_t *current, int value, tree_t *tree)
 {
   if (!current)
   {
@@ -127,12 +128,12 @@ bt_node_t* del_bt_node_t(bt_node_t *root, bt_node_t *current, int value, bt_t *t
 
   else if (value < current->value)
   {
-    return del_bt_node_t(current, current->left, value, tree);
+    return del_node_t(current, current->left, value, tree);
   }
 
   else if (value > current->value)
   {
-    return del_bt_node_t(current, current->right, value, tree);
+    return del_node_t(current, current->right, value, tree);
   }
 
   else
@@ -161,7 +162,7 @@ bt_node_t* del_bt_node_t(bt_node_t *root, bt_node_t *current, int value, bt_t *t
 
     else if (!(current->left && current->right) && (current->left || current->right)) // У узла есть всего один потомок
     {
-      bt_node_t *new_current = current->left;
+      node_t *new_current = current->left;
 
       if (!new_current)
       {
@@ -190,8 +191,8 @@ bt_node_t* del_bt_node_t(bt_node_t *root, bt_node_t *current, int value, bt_t *t
 
     else // У узла есть два потомка
     {
-      bt_node_t *new_current = current->left;
-      bt_node_t *root_for_new_current = current;
+      node_t *new_current = current->left;
+      node_t *root_for_new_current = current;
 
       if (new_current->right)
       {
@@ -239,9 +240,9 @@ bt_node_t* del_bt_node_t(bt_node_t *root, bt_node_t *current, int value, bt_t *t
   }
 }
 
-void del_bt_t(bt_t *tree, int value)
+void del_tree_t(tree_t *tree, int value)
 {
-  bt_node_t *removed_node = del_bt_node_t(NULL, tree->root, value, tree);
+  node_t *removed_node = del_node_t(NULL, tree->root, value, tree);
   if (!removed_node)
   {
     printf("Nothing found.\n");
@@ -253,31 +254,131 @@ void del_bt_t(bt_t *tree, int value)
   printf("Success\n");
 }
 
-int get_height_bt_node_t(bt_node_t *root, int s)
+// int get_height_node_t(node_t *root, int s)
+// {
+//   if (!root)
+//     return s;
+//
+//   s += 1;
+//
+//   int h1 = get_height_node_t(root->left, s);
+//   int h2 = get_height_node_t(root->right, s);
+//
+//   return (h1 > h2) ? h1 : h2;
+// }
+//
+// void fix_height_node_t(node_t *root, int s)
+// {
+//   if (!root) return;
+//
+//   root->height = s;
+//
+//   fix_height_node_t(root->left, s-1);
+//   fix_height_node_t(root->right, s-1);
+// }
+//
+// void fix_height_tree_t(tree_t *tree)
+// {
+//   int h = get_height_node_t(tree->root, -1);
+//   fix_height_node_t(tree->root, h);
+// }
+
+int height(node_t* p)
 {
-  if (!root)
-    return s;
-
-  s += 1;
-
-  int h1 = get_height_bt_node_t(root->left, s);
-  int h2 = get_height_bt_node_t(root->right, s);
-
-  return (h1 > h2) ? h1 : h2;
+	return p?p->height:0;
 }
 
-void fix_height_bt_node_t(bt_node_t *root, int s)
+int bfactor(node_t* p)
 {
-  if (!root) return;
-
-  root->height = s;
-
-  fix_height_bt_node_t(root->left, s-1);
-  fix_height_bt_node_t(root->right, s-1);
+	return height(p->right)-height(p->left);
 }
 
-void fix_height_bt_t(bt_t *tree)
+void fixheight(node_t* p)
 {
-  int h = get_height_bt_node_t(tree->root, -1);
-  fix_height_bt_node_t(tree->root, h);
+	int hl = height(p->left);
+	int hr = height(p->right);
+	p->height = (hl>hr?hl:hr)+1;
+}
+
+node_t* rotateright(node_t* p) // правый поворот вокруг p
+{
+	node_t* q = p->left;
+	p->left = q->right;
+	q->right = p;
+	fixheight(p);
+	fixheight(q);
+	return q;
+}
+
+node_t* rotateleft(node_t* q) // левый поворот вокруг q
+{
+	node_t* p = q->right;
+	q->right = p->left;
+	p->left = q;
+	fixheight(q);
+	fixheight(p);
+	return p;
+}
+
+node_t* balance(node_t* p) // балансировка узла p
+{
+	fixheight(p);
+	if( bfactor(p)==2 )
+	{
+		if( bfactor(p->right) < 0 )
+			p->right = rotateright(p->right);
+		return rotateleft(p);
+	}
+	if( bfactor(p)==-2 )
+	{
+		if( bfactor(p->left) > 0  )
+			p->left = rotateleft(p->left);
+		return rotateright(p);
+	}
+	return p; // балансировка не нужна
+}
+
+node_t* insert(node_t* p, int k) // вставка ключа k в дерево с корнем p
+{
+	if( !p ) return new_node_t(k);
+	if( k<p->value )
+		p->left = insert(p->left,k);
+	else
+		p->right = insert(p->right,k);
+	return balance(p);
+}
+
+node_t* findmin(node_t* p) // поиск узла с минимальным ключом в дереве p
+{
+	return p->left?findmin(p->left):p;
+}
+
+node_t* removemin(node_t* p) // удаление узла с минимальным ключом из дерева p
+{
+	if( p->left==0 )
+		return p->right;
+	p->left = removemin(p->left);
+	return balance(p);
+}
+
+node_t* delete(node_t* p, int k) // удаление ключа k из дерева p
+{
+	if( !p ) return 0;
+	if( k < p->value )
+		p->left = delete(p->left,k);
+	else if( k > p->value )
+		p->right = delete(p->right,k);
+  else //  k == p->key
+	{
+		node_t* q = p->left;
+		node_t* r = p->right;
+		// delete p;
+    free(p);
+		if( !r ) return q;
+		node_t* min = findmin(r);
+		min->right = removemin(r);
+		min->left = q;
+		return balance(min);
+	}
+  return balance(p);
 }

@@ -6,10 +6,10 @@ typedef struct
   char *filename;
   int len;
   int *data;
-} tf_t;
+} text_file_t;
 
-int create_tf_t(char *filename, tf_t *textfile);
-int delete_tf_t(tf_t *textfile, int alpha);
-void pri_tf_t(tf_t *tf);
+text_file_t *create_text_file_t(char *filename);
+int delete_text_file_t(text_file_t *textfile, int alpha);
+void pri_text_file_t(text_file_t *tf);
 
 #endif

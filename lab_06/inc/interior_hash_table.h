@@ -1,30 +1,30 @@
-#ifndef IHT_H
-#define IHT_H
+#ifndef table_H
+#define table_H
 
 #define ALLOCATION_FACTOR 2
 
-typedef struct iht_elem iht_elem_t;
-struct iht_elem
+typedef struct element element_t;
+struct element
 {
   int value;
   int free;
 };
 
-typedef struct iht iht_t;
-struct iht
+typedef struct table table_t;
+struct table
 {
-  iht_elem_t *data;
+  element_t *data;
   int allocated;
   int elem_amount;
   int factor_number;
 };
 
-iht_t *new_iht_t(int nmemb);
-iht_t *add_iht_t(iht_t *iht, int alpha);
-void free_iht_t(iht_t *iht);
-void pri_iht_t(iht_t *iht);
-iht_elem_t *find_iht_t(iht_t *iht, int alpha, int *buf);
-void del_iht_t(iht_t *iht, int alpha, int *buf);
-iht_t *refactor_iht_t(iht_t *iht);
+table_t *new_table_t(int nmemb);
+table_t *add_table_t(table_t *table, int alpha);
+void free_table_t(table_t *table);
+void pri_table_t(table_t *table);
+element_t *find_table_t(table_t *table, int alpha, int *buf);
+void del_table_t(table_t *table, int alpha, int *buf);
+table_t *refactor_table_t(table_t *table);
 
 #endif
