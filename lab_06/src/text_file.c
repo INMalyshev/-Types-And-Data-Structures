@@ -34,11 +34,11 @@ int delete_text_file_t(text_file_t *textfile, int alpha)
   {
     if (textfile->data[i] == alpha)
     {
-      printf("\nNumber of comparisons: %d\n\n", i + 1);
+      printf("Number of comparisons: %d\n", i + 1);
 
       for (int j = i; j < textfile->len - 1; j++)
       {
-        textfile->data[i] = textfile->data[i+1];
+        textfile->data[j] = textfile->data[j+1];
       }
       textfile->len -= 1;
 
@@ -46,9 +46,9 @@ int delete_text_file_t(text_file_t *textfile, int alpha)
       if (!f) return 1;
 
       fprintf(f, "%d\n", textfile->len);
-      for (int k = 0; i < textfile->len; k++)
+      for (int k = 0; k < textfile->len; k++)
       {
-        fprintf(f, "%d\n", textfile->data[i]);
+        fprintf(f, "%d\n", textfile->data[k]);
       }
 
       fclose(f);
@@ -76,4 +76,32 @@ void pri_text_file_t(text_file_t *tf)
   {
     printf("<index: %d> <value: %d>\n", i, tf->data[i]);
   }
+}
+
+int find_text_file_t(text_file_t *text_file, int key)
+{
+  for (int i = 0; i < text_file->len; i++)
+    if (key == text_file->data[i])
+      return i;
+
+  printf("Nothing found.\n");
+  return -1;
+}
+
+void insert_text_file_t(text_file_t *text_file, int key)
+{
+  text_file->data = realloc(text_file->data, (text_file->len + 1) * sizeof(int));
+  text_file->len += 1;
+  text_file->data[text_file->len-1] = key;
+
+  FILE *f = fopen(text_file->filename, "wt");
+  if (!f) return;
+
+  fprintf(f, "%d\n", text_file->len);
+  for (int k = 0; k < text_file->len; k++)
+  {
+    fprintf(f, "%d\n", text_file->data[k]);
+  }
+
+  fclose(f);
 }

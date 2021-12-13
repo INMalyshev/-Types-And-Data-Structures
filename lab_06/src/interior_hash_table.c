@@ -6,6 +6,7 @@
 table_t *new_table_t(int nmemb)
 {
   table_t *table = malloc(sizeof(table_t));
+  if (nmemb <= 0) nmemb = 10;
 
   table->data = malloc(nmemb * sizeof(element_t));
   table->allocated = nmemb;
@@ -92,7 +93,7 @@ void del_table_t(table_t *table, int alpha, int *buf)
   element_t *elem = find_table_t(table, alpha, buf);
   if (!elem)
   {
-    printf("Element is not found.\n");
+    printf("Nothing found.\n");
     return;
   }
   elem->free = 1;

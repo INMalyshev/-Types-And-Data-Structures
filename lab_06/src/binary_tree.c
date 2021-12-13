@@ -156,7 +156,7 @@ node_t* del_node_t(node_t *root, node_t *current, int value, tree_t *tree)
       else
       {
         tree->root = NULL;
-        return current;
+        return NULL;
       }
     }
 
@@ -240,18 +240,45 @@ node_t* del_node_t(node_t *root, node_t *current, int value, tree_t *tree)
   }
 }
 
+node_t *del(node_t *p, int k)
+{
+	if( !p )
+  {
+    printf("Noting found.\n");
+    return 0;
+  }
+	if( k < p->value )
+		p->left = del(p->left,k);
+	else if( k > p->value )
+		p->right = del(p->right,k);
+  else //  k == p->key
+	{
+		node_t* q = p->left;
+		node_t* r = p->right;
+		// delete p;
+    free(p);
+		if( !r ) return q;
+		node_t* min = findmin(r);
+		min->right = removemin(r);
+		min->left = q;
+		return min;
+	}
+  return p;
+}
+
 void del_tree_t(tree_t *tree, int value)
 {
-  node_t *removed_node = del_node_t(NULL, tree->root, value, tree);
-  if (!removed_node)
-  {
-    printf("Nothing found.\n");
-    return;
-  }
+  // node_t *removed_node = del_node_t(NULL, tree->root, value, tree);
+  tree->root = del(tree->root, value);
+  // if (!removed_node)
+  // {
+  //   printf("Nothing found.\n");
+  //   return;
+  // }
 
-  free(removed_node);
+  // free(removed_node);
 
-  printf("Success\n");
+  // printf("Success\n");
 }
 
 // int get_height_node_t(node_t *root, int s)
@@ -363,7 +390,11 @@ node_t* removemin(node_t* p) // удаление узла с минимальн�
 
 node_t* delete(node_t* p, int k) // удаление ключа k из дерева p
 {
-	if( !p ) return 0;
+	if( !p )
+  {
+    printf("Noting found.\n");
+    return 0;
+  }
 	if( k < p->value )
 		p->left = delete(p->left,k);
 	else if( k > p->value )
