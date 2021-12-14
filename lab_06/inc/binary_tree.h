@@ -18,7 +18,7 @@ struct tree
 };
 
 void free_node_t(node_t *root);
-void free_tree_t_t(tree_t *tree);
+void free_tree_t(tree_t *tree);
 node_t *find_node_t(node_t *root, int alpha, int *buf);
 node_t *new_node_t(int alpha);
 void add_node_t(node_t *root, int alpha);

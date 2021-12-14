@@ -244,7 +244,7 @@ node_t *del(node_t *p, int k)
 {
 	if( !p )
   {
-    printf("Noting found.\n");
+    // printf("Noting found.\n");
     return 0;
   }
 	if( k < p->value )
@@ -392,7 +392,7 @@ node_t* delete(node_t* p, int k) // удаление ключа k из дере�
 {
 	if( !p )
   {
-    printf("Noting found.\n");
+    // printf("Noting found.\n");
     return 0;
   }
 	if( k < p->value )

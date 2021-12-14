@@ -12,6 +12,7 @@ table_t *new_table_t(int nmemb)
   table->allocated = nmemb;
   table->elem_amount = 0;
   table->factor_number = nmemb;
+  table->collision = 0;
 
   for (int i = 0; i < table->allocated; i++)
   {
@@ -26,6 +27,10 @@ table_t *add_table_t(table_t *table, int alpha)
   if (table->elem_amount < table->allocated)
   {
     int index = alpha % table->factor_number;
+
+    if (!table->data[index].free)
+      table->collision += 1;
+
     for (int j = 0; j < table->allocated; j++)
     {
       int i = (index + j) % table->factor_number;
@@ -60,6 +65,7 @@ void pri_table_t(table_t *table)
     printf("Empty interior hash table.\n\n");
     return;
   }
+  printf("Collision: %d (%.1lf%%)\n", table->collision, (double) table->collision / table->elem_amount *100);
   for (int i = 0; i < table->allocated; i++)
   {
     if (!table->data[i].free)
@@ -93,9 +99,15 @@ void del_table_t(table_t *table, int alpha, int *buf)
   element_t *elem = find_table_t(table, alpha, buf);
   if (!elem)
   {
-    printf("Nothing found.\n");
+    // printf("Nothing found.\n");
     return;
   }
+
+  int index = alpha % table->factor_number;
+
+  if (!table->data[index].free && table->data[index].value != alpha)
+    table->collision -= 1;
+
   elem->free = 1;
 }
 

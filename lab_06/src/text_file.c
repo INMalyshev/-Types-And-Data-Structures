@@ -34,7 +34,7 @@ int delete_text_file_t(text_file_t *textfile, int alpha)
   {
     if (textfile->data[i] == alpha)
     {
-      printf("Number of comparisons: %d\n", i + 1);
+      // printf("Number of comparisons: %d\n", i + 1);
 
       for (int j = i; j < textfile->len - 1; j++)
       {
@@ -57,7 +57,7 @@ int delete_text_file_t(text_file_t *textfile, int alpha)
     }
   }
 
-  printf("Nothing found.\n");
+  // printf("Nothing found.\n");
 
   return 0;
 }

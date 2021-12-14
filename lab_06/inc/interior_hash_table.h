@@ -17,6 +17,7 @@ struct table
   int allocated;
   int elem_amount;
   int factor_number;
+  int collision;
 };
 
 table_t *new_table_t(int nmemb);

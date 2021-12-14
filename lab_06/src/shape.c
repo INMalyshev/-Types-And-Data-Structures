@@ -3,6 +3,7 @@
 #include <limits.h>
 #include <inttypes.h>
 
+
 #include "shape.h"
 #include "tick.h"
 
@@ -56,6 +57,8 @@ void menu(void)
   printf("\n");
   printf("  5. Refactor hash table;\n");
   printf("\n");
+  printf("  6. Generate statistics;\n");
+  printf("\n");
   printf("  0. Exit.\n");
   printf("+--------------------------------------------------------------------+\n");
 }
@@ -98,7 +101,7 @@ int mainloop_iteration(structures_t *structures)
 
   menu();
 
-  int choice = get_choice(0, 5);
+  int choice = get_choice(0, 6);
 
   switch (choice)
   {
@@ -241,8 +244,108 @@ int mainloop_iteration(structures_t *structures)
       printf("Refactor hash table.\n\n");
       structures->table = refactor_table_t(structures->table);
       printf("Ok.\n\n");
+      break;
+    }
+    case 6:
+    {
+      gen_stat();
+      break;
     }
   }
 
   return choice;
+}
+
+void gen_stat(void)
+{
+  printf("Enter initial element amount:\n");
+  int len = get_choice(0, 200);
+
+  printf("Binary tree size:          %lld\n", sizeof(node_t) * len + sizeof(tree_t));
+  printf("Balanced binary tree size: %lld\n", sizeof(node_t) * len);
+  printf("Hash table size:           %lld\n", sizeof(element_t) * len + sizeof(table_t));
+  printf("File data size:            %lld\n", sizeof(int) * len + sizeof(text_file_t));
+
+  tree_t *bt = new_tree_t();
+  node_t *bbt = NULL;
+  table_t *table = new_table_t(len+1);
+  text_file_t tf = {"test.txt", len + 1, malloc(len*sizeof(int))};
+
+  for (int i = 0; i < len; i++)
+  {
+    add_tree_t(bt, rand()%100);
+    bbt = insert(bbt, rand()%100);
+    table = add_table_t(table, rand()%100);
+    tf.data[i] = rand()%100;
+  }
+
+  uint64_t t1, t2;
+  uint64_t ia = 0, ra = 0, ib = 0, rb = 0, ic = 0, rc = 0, id = 0, rd = 0;
+
+  int buf = 0;
+
+  for (int i = 0; i < 100; i++)
+  {
+    t1 = tick();
+    add_tree_t(bt, rand()%100);
+    t2 = tick();
+    ia += t2 - t1;
+
+    t1 = tick();
+    del_tree_t(bt, rand()%100);
+    t2 = tick();
+    ra += t2 - t1;
+
+    t1 = tick();
+    bbt = insert(bbt, rand()%100);
+    t2 = tick();
+    ib += t2 - t1;
+
+    t1 = tick();
+    bbt = delete(bbt, rand()%100);
+    t2 = tick();
+    rb += t2 - t1;
+
+    t1 = tick();
+    table = add_table_t(table, rand()%100);
+    t2 = tick();
+    ic += t2 - t1;
+
+    t1 = tick();
+    del_table_t(table, rand()%100, &buf);
+    t2 = tick();
+    rc += t2 - t1;
+
+    t1 = tick();
+    insert_text_file_t(&tf, rand()%100);
+    t2 = tick();
+    id += t2 - t1;
+
+    t1 = tick();
+    delete_text_file_t(&tf, rand()%100);
+    t2 = tick();
+    rd += t2 - t1;
+  }
+
+  printf("\n");
+  printf("Binary tree:\n");
+  printf("Insert: %"PRIu64" ticks\n", ia/100);
+  printf("Remove: %"PRIu64" ticks\n", ra/100);
+  printf("\n");
+  printf("Balanced binary tree:\n");
+  printf("Insert: %"PRIu64" ticks\n", ib/100);
+  printf("Remove: %"PRIu64" ticks\n", rb/100);
+  printf("\n");
+  printf("Interior hash table:\n");
+  printf("Insert: %"PRIu64" ticks\n", ic/100);
+  printf("Remove: %"PRIu64" ticks\n", rc/100);
+  printf("\n");
+  printf("Text file:\n");
+  printf("Insert: %"PRIu64" ticks\n", id/100);
+  printf("Remove: %"PRIu64" ticks\n", rd/100);
+
+  free_tree_t(bt);
+  free_node_t(bbt);
+  free_table_t(table);
+  free(tf.data);
 }
