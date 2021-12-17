@@ -28,4 +28,8 @@ element_t *find_table_t(table_t *table, int alpha, int *buf);
 void del_table_t(table_t *table, int alpha, int *buf);
 table_t *refactor_table_t(table_t *table);
 
+int next_prime(int a);
+int next_size(int a);
+int hash_func(int key, int factor);
+
 #endif

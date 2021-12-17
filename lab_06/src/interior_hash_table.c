@@ -26,7 +26,7 @@ table_t *add_table_t(table_t *table, int alpha)
 {
   if (table->elem_amount < table->allocated)
   {
-    int index = alpha % table->factor_number;
+    int index = hash_func(alpha, table->factor_number);
 
     if (!table->data[index].free)
       table->collision += 1;
@@ -68,10 +68,12 @@ void pri_table_t(table_t *table)
   printf("Collision: %d (%.1lf%%)\n", table->collision, (double) table->collision / table->elem_amount *100);
   for (int i = 0; i < table->allocated; i++)
   {
+    printf("<index: %d>", i);
     if (!table->data[i].free)
     {
-      printf("<index: %d> <value: %d>\n", i, table->data[i].value);
+      printf(" <value: %d>", table->data[i].value);
     }
+    printf("\n");
   }
   printf("\n");
 }
@@ -79,7 +81,7 @@ void pri_table_t(table_t *table)
 element_t *find_table_t(table_t *table, int alpha, int *buf)
 {
   int counter = 0;
-  int index = alpha % table->factor_number;
+  int index = hash_func(alpha, table->factor_number);
   for (int j = 0; j < table->allocated; j++)
   {
     counter++;
@@ -103,17 +105,25 @@ void del_table_t(table_t *table, int alpha, int *buf)
     return;
   }
 
-  int index = alpha % table->factor_number;
+  int index = hash_func(alpha, table->factor_number);
 
-  if (!table->data[index].free && table->data[index].value != alpha)
+  if (&(table->data[index]) != elem)
     table->collision -= 1;
 
   elem->free = 1;
+  table->elem_amount -= 1;
+
+  if (0 == table->elem_amount)
+  {
+    table->data = realloc(table->data, 5 * sizeof(element_t));
+    table->allocated = 5;
+    table->factor_number = 5;
+  }
 }
 
 table_t *refactor_table_t(table_t *table)
 {
-  table_t *new = new_table_t(table->allocated * ALLOCATION_FACTOR);
+  table_t *new = new_table_t(next_size(table->allocated));
   for (int i = 0; i < table->allocated; i++)
   {
     if (!table->data[i].free)
@@ -123,4 +133,35 @@ table_t *refactor_table_t(table_t *table)
   }
   free_table_t(table);
   return new;
+}
+
+int next_prime(int a)
+{
+  int is_prime = 0;
+  for (int b = a + 1; !is_prime; b++)
+  {
+    is_prime = 1;
+    for (int i = 2; i < b; i++)
+      if (b%i==0){
+        is_prime = 0;
+        break;
+      }
+    if (is_prime)
+      return b;
+  }
+  return 0;
+}
+
+int next_size(int a)
+{
+  int cur = a;
+  for (int i = 0; i < a / 50 + 1; i++)
+    cur = next_prime(cur);
+  return cur;
+}
+
+int hash_func(int key, int factor)
+{
+  if (key < 0) key*=-1;
+  return key % factor;
 }

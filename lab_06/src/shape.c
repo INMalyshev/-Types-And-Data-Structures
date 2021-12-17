@@ -74,14 +74,14 @@ structures_t *index(char *filename)
     return NULL;
   }
 
-  tree_t *casual_tree = new_tree_t();
+  node_t *casual_tree = NULL;
   node_t *balanced_tree = NULL;
-  table_t *hash_table = new_table_t(text_file->len);
+  table_t *hash_table = new_table_t(3);
 
   for (int i = 0; i < text_file->len; i++)
   {
-    add_tree_t(casual_tree, text_file->data[i]);
-    balanced_tree = insert(balanced_tree, text_file->data[i]);
+    casual_tree = insert(casual_tree, text_file->data[i], 0);
+    balanced_tree = insert(balanced_tree, text_file->data[i], 1);
     hash_table = add_table_t(hash_table, text_file->data[i]);
   }
 
@@ -116,7 +116,7 @@ int mainloop_iteration(structures_t *structures)
       // int buf = 0;
       printf("\nCasual binary tree:\n");
       t1 = tick();
-      add_tree_t(structures->casual_tree, key);
+      structures->casual_tree = insert(structures->casual_tree, key, 0);
       // if (!result) printf("Nothing found.\n");
       // printf("Comparison amount: %d\n", buf);
       t2 = tick();
@@ -125,7 +125,7 @@ int mainloop_iteration(structures_t *structures)
       // buf = 0;
       printf("\nBalanced binary tree:\n");
       t1 = tick();
-      structures->balanced_tree = insert(structures->balanced_tree, key);
+      structures->balanced_tree = insert(structures->balanced_tree, key, 1);
       // if (!result) printf("Nothing found.\n");
       // printf("Comparison amount: %d\n", buf);
       t2 = tick();
@@ -160,7 +160,7 @@ int mainloop_iteration(structures_t *structures)
       int buf = 0;
       printf("\nCasual binary tree:\n");
       t1 = tick();
-      node_t *result = find_node_t(structures->casual_tree->root, key, &buf);
+      node_t *result = find_node_t(structures->casual_tree, key, &buf);
       if (!result) printf("Nothing found.\n");
       // printf("Comparison amount: %d\n", buf);
       t2 = tick();
@@ -204,13 +204,13 @@ int mainloop_iteration(structures_t *structures)
 
       printf("\nCasual binary tree:\n");
       t1 = tick();
-      del_tree_t(structures->casual_tree, key);
+      structures->casual_tree = delete(structures->casual_tree, key, 0);
       t2 = tick();
       printf("Processor run time ---> %" PRIu64 " ticks\n", t2 - t1);
 
       printf("\nBalanced binary tree:\n");
       t1 = tick();
-      structures->balanced_tree = delete(structures->balanced_tree, key);
+      structures->balanced_tree = delete(structures->balanced_tree, key, 1);
       t2 = tick();
       printf("Processor run time ---> %" PRIu64 " ticks\n", t2 - t1);
 
@@ -232,9 +232,10 @@ int mainloop_iteration(structures_t *structures)
     case 4:
     {
       printf("Print.\n\n");
-      pri_tree_t(structures->casual_tree);
+      printf("\nCasual binary search tree prefix form:\n\n");
+      pri_node_t(structures->casual_tree, 0);
       printf("\nBalanced binary search tree prefix form:\n\n");
-      pri_node_t(structures->balanced_tree);
+      pri_node_t(structures->balanced_tree, 0);
       pri_table_t(structures->table);
       pri_text_file_t(structures->text_file);
       break;
@@ -261,20 +262,15 @@ void gen_stat(void)
   printf("Enter initial element amount:\n");
   int len = get_choice(0, 200);
 
-  printf("Binary tree size:          %lld\n", sizeof(node_t) * len + sizeof(tree_t));
-  printf("Balanced binary tree size: %lld\n", sizeof(node_t) * len);
-  printf("Hash table size:           %lld\n", sizeof(element_t) * len + sizeof(table_t));
-  printf("File data size:            %lld\n", sizeof(int) * len + sizeof(text_file_t));
-
-  tree_t *bt = new_tree_t();
+  node_t *bt = NULL;
   node_t *bbt = NULL;
   table_t *table = new_table_t(len+1);
   text_file_t tf = {"test.txt", len + 1, malloc(len*sizeof(int))};
 
   for (int i = 0; i < len; i++)
   {
-    add_tree_t(bt, rand()%100);
-    bbt = insert(bbt, rand()%100);
+    bt = insert(bt, rand()%100, 0);
+    bbt = insert(bbt, rand()%100, 1);
     table = add_table_t(table, rand()%100);
     tf.data[i] = rand()%100;
   }
@@ -287,22 +283,22 @@ void gen_stat(void)
   for (int i = 0; i < 100; i++)
   {
     t1 = tick();
-    add_tree_t(bt, rand()%100);
+    bt = insert(bt, rand()%100, 0);
     t2 = tick();
     ia += t2 - t1;
 
     t1 = tick();
-    del_tree_t(bt, rand()%100);
+    bt = delete(bt, rand()%100, 0);
     t2 = tick();
     ra += t2 - t1;
 
     t1 = tick();
-    bbt = insert(bbt, rand()%100);
+    bbt = insert(bbt, rand()%100, 1);
     t2 = tick();
     ib += t2 - t1;
 
     t1 = tick();
-    bbt = delete(bbt, rand()%100);
+    bbt = delete(bbt, rand()%100, 1);
     t2 = tick();
     rb += t2 - t1;
 
@@ -327,6 +323,11 @@ void gen_stat(void)
     rd += t2 - t1;
   }
 
+  printf("Binary tree size:          %lld\n", sizeof(node_t) * len);
+  printf("Balanced binary tree size: %lld\n", sizeof(node_t) * len);
+  printf("Hash table size:           %lld\n", sizeof(element_t) * table->factor_number + sizeof(table_t));
+  printf("File data size:            %lld\n", sizeof(int) * len + sizeof(text_file_t));
+
   printf("\n");
   printf("Binary tree:\n");
   printf("Insert: %"PRIu64" ticks\n", ia/100);
@@ -344,7 +345,7 @@ void gen_stat(void)
   printf("Insert: %"PRIu64" ticks\n", id/100);
   printf("Remove: %"PRIu64" ticks\n", rd/100);
 
-  free_tree_t(bt);
+  free_node_t(bt);
   free_node_t(bbt);
   free_table_t(table);
   free(tf.data);

@@ -23,9 +23,6 @@ int main(int argc, char **argv)
   }
 
   while (mainloop_iteration(structures));
-  // {
-  //   printf("OK\n");
-  // }
 
   return 0;
 }

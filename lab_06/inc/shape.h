@@ -11,7 +11,7 @@ void menu(void);
 
 typedef struct
 {
-  tree_t *casual_tree;
+  node_t *casual_tree;
   node_t *balanced_tree;
   table_t *table;
   text_file_t *text_file;
@@ -19,5 +19,6 @@ typedef struct
 
 int mainloop_iteration(structures_t *stuctures);
 structures_t *index(char *filename);
+void gen_stat(void);
 
 #endif
