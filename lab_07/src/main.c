@@ -7,7 +7,7 @@ int main(void)
 {
   setbuf(stdout, NULL);
 
-  graph_t *graph = new(6);
+  graph_t *graph = newGraph(6);
   graph->graph[0][1] = 7;
   graph->graph[1][0] = 7;
   graph->graph[0][2] = 9;
