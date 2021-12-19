@@ -12,7 +12,7 @@ graph_t *newGraph(int size)
   new->graph = malloc(size * sizeof(int*));
 
   for (int i = 0; i < size; i++)
-    new->graph[i] = malloc(size * sizeof(int));
+    new->graph[i] = calloc(size, sizeof(int));
 
   return new;
 }
@@ -113,10 +113,10 @@ graph_t *_copy(graph_t *graph)
   return new;
 }
 
-void _insert(graph_t *graph, int ci, int cj)
+void _set(graph_t *graph, int ci, int cj, int value)
 {
-  graph->graph[ci][cj] = 1;
-  graph->graph[cj][ci] = 1;
+  graph->graph[ci][cj] = value;
+  graph->graph[cj][ci] = value;
 }
 
 graph_t *_findSolution(graph_t *graph, int bi, int mrl)
@@ -124,43 +124,101 @@ graph_t *_findSolution(graph_t *graph, int bi, int mrl)
   if (_conditional(graph, bi, mrl))
     return _copy(graph);
 
-  graph_t *processing = NULL;
+  graph_t *processing = _copy(graph);
 
   for (int fi = 0; fi < graph->size; fi++){
     for (int fj = 0; fj < graph->size; fj++){
 
-      freeGraph(processing);
-      processing = _copy(graph);
+      if (fi == fj)
+        continue;
       if (_inGraph(processing, fi, fj))
         continue;
-      _insert(processing, fi, fj);
+      _set(processing, fi, fj, 1);
       if (_conditional(processing, bi, mrl))
         return processing;
 
       for (int si = fi; si < graph->size; si++){
         for (int sj = fj; sj < graph->size; sj++){
 
+          if (si == sj)
+            continue;
           if (_inGraph(processing, si, sj))
             continue;
-          _insert(processing, si, sj);
+          _set(processing, si, sj, 1);
           if (_conditional(processing, bi, mrl))
             return processing;
 
           for (int ti = si; ti < graph->size; ti++){
             for (int tj = sj; tj < graph->size; tj++){
 
+              if (ti == tj)
+                continue;
               if (_inGraph(processing, ti, tj))
                 continue;
-              _insert(processing, ti, tj);
+              _set(processing, ti, tj, 1);
               if (_conditional(processing, bi, mrl))
                 return processing;
+
+              _set(processing, ti, tj, 0);
             }
           }
+
+          _set(processing, si, sj, 0);
         }
       }
+
+      _set(processing, fi, fj, 0);
     }
   }
 
   freeGraph(processing);
   return NULL;
+}
+
+void createDotFile(graph_t *graph, char *dotFileName)
+{
+  FILE *f = fopen(dotFileName, "wt");
+
+  fprintf(f, "graph G {\n");
+
+  for (int i = 0; i < graph->size; i++)
+    fprintf(f, "  %d;\n", i);
+
+  for (int i = 0; i < graph->size; i++){
+    for (int j = i; j < graph->size; j++){
+      if (graph->graph[i][j] && graph->graph[j][i]){
+        fprintf(f, "  %d -- %d;\n", i, j);
+      }
+    }
+  }
+
+  fprintf(f, "}\n");
+
+  fclose(f);
+}
+
+graph_t *createGraph(char *fileName)
+{
+  FILE *f = fopen(fileName, "rt");
+  if (!f) return NULL;
+
+  int dotAmount, rootAmount;
+  if (!fscanf(f, "%d", &dotAmount)) return NULL;
+  if (dotAmount < 3) return NULL;
+  if (!fscanf(f, "%d", &rootAmount)) return NULL;
+  if (rootAmount < 0) return NULL;
+
+  graph_t *graph = newGraph(dotAmount);
+
+  int a, b;
+
+  for (int i = 0; i < rootAmount; i++){
+    if (!fscanf(f, "%d", &a)) return NULL;
+    if (a < 0 || a >= dotAmount) return NULL;
+    if (!fscanf(f, "%d", &b)) return NULL;
+    if (b < 0 || b >= dotAmount) return NULL;
+    _set(graph, a, b, 1);
+  }
+
+  return graph;
 }
