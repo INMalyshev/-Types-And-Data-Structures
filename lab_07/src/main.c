@@ -1,8 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <limits.h>
+#include <inttypes.h>
 
 #include "graph.h"
+#include "tick.h"
 
 void skip_stdin(void)
 {
@@ -60,6 +62,9 @@ int main(int argc, char **argv)
     return 1;
   }
 
+  size_t w = sizeof(graph_t) + graph->size * sizeof(int*) + graph->size * graph->size * sizeof(int);
+  printf("Память требуемая для хранения графа: %d (в байтах)\n", (int) w);
+
   printf("Был сгенерирован svg файл с представлением введенного графа:\n");
   createDotFile(graph, "graph.txt");
   system("dot -Tsvg -o graph.svg ./graph.txt");
@@ -73,7 +78,14 @@ int main(int argc, char **argv)
 
   int mrl = get_choice(1, INT_MAX);
 
+  int64_t t1, t2;
+
+  t1 = tick();
   graph_t *solution = _findSolution(graph, bi, mrl);
+  t2 = tick();
+
+  printf("Время выполнения алгоритма: %"PRIu64" (тактов процессора).\n", t2 - t1);
+
   if (!solution){
     printf("Программой определено, что условие задачи не выполняется.\n");
     printf("Успешное завершение программы.\n");
